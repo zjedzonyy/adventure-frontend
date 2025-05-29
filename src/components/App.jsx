@@ -4,11 +4,11 @@ import { AuthProvider } from "./AuthContext";
 
 function App() {
   return (
-    <AuthProvider>
-      <div className="h-full bg-gray-500 p-0">
-        <Outlet />
-      </div>
-    </AuthProvider>
+    // <AuthProvider>
+    <div className="h-full bg-gray-500 p-0">
+      <Outlet />
+    </div>
+    // </AuthProvider>
   );
 }
 

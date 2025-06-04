@@ -1,14 +1,15 @@
+import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 import { AuthProvider } from "./AuthContext";
 
 function App() {
   return (
-    // <AuthProvider>
-    <div className="h-full bg-gray-500 p-0">
-      <Outlet />
-    </div>
-    // </AuthProvider>
+    <AuthProvider>
+      <div className="min-h-screen dark:dark_background p-0">
+        <Outlet />
+      </div>
+    </AuthProvider>
   );
 }
 

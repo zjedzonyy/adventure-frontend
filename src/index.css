@@ -8,82 +8,33 @@
   line-height: 1.5;
   font-weight: 400;
   font-size: 21px;
-  color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  --primary: #2b2a2a;
-  --secondary: #585858;
-  --background: #d4d4d4;
-  --card-bg: #ffffff;
-  --text-primary: #eeeeee;
-  --text-secondary: #707070;
-  --success: #4caf50;
-  --danger: #e63946;
-  --text-hover: #e1ffc7;
-  --gradient-primary: linear-gradient(90deg, #4caf50 0%, #45a049 100%);
-  --gradient-secondary: linear-gradient(90deg, #8aeb36 0%, #4caf50 100%);
-  --main-background: linear-gradient(90deg, #45a049 0%, #8aeb36 100%);
-  --button-bg: var(--primary);
-  --button-hover: var(--secondary);
-  --checkout-bg: var(--background);
-  --checkout-border: var(--secondary);
-  --footer-bg: var(--primary);
-  --footer-text: white;
+}
+.dark {
+  background-color: oklch(27.8% 0.033 256.848);
 }
 
 html {
-  height: 100%;
+  min-height: 100%;
 }
 
 body {
   margin: 0;
+  min-height: 100vh;
   display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100%;
-  height: 100%;
-  background-color: var(--background);
+  flex-direction: column;
   color: var(--text-primary);
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background: var(--button-bg);
-  color: white;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-
-button:hover {
-  background: var(--button-hover);
-}
-
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #45a049;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+input {
+  color: var(--text-secondary);
+  border: #1f1f1f 1px solid;
+  border-radius: 4px;
+  background-color: var(--card-bg);
 }
 
 html,
@@ -97,7 +48,6 @@ body {
   flex-direction: column;
   width: 100%;
   margin: 0 0;
-  overflow: hidden;
 }
 
 main {

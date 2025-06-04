@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { NavLink } from "react-router-dom";
 import { apiUrl } from "../../utils/api.js";
 import {
   Search,
@@ -13,7 +14,10 @@ import {
   Eye,
   EyeOff,
   AlertCircle,
+  Sun,
+  Moon,
 } from "lucide-react";
+import { AuthContext } from "../AuthContext.jsx";
 
 export default function SignUp() {
   const [registerData, setRegisterData] = useState({
@@ -32,6 +36,8 @@ export default function SignUp() {
     confirmPassword: "",
     sendData: "",
   });
+
+  const { darkMode, toggleDarkMode } = React.useContext(AuthContext);
 
   // If registerData.password and confirmPassword are not empty and do not match, show an error message
   const validateConfirmPassword = (password, confirm) => {
@@ -116,12 +122,24 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500 flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500 dark:from-purple-900 dark:via-blue-900 dark:to-cyan-800 flex items-center justify-center p-4 relative">
+      {" "}
+      <button
+        onClick={toggleDarkMode}
+        className="absolute top-6 right-6 p-3 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all duration-200 z-10"
+      >
+        {darkMode ? (
+          <Sun className="w-6 h-6 text-yellow-500" />
+        ) : (
+          <Moon className="w-6 h-6 text-gray-600" />
+        )}
+      </button>
       <div className="bg-white rounded-2xl shadow-2xl px-8 py-4 w-full max-w-md">
         <div className="text-center mb-4">
           <div className="bg-gradient-to-r from-purple-600 to-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
             <User className="w-8 h-8 text-white" />
           </div>
+
           <h2 className="text-3xl font-bold text-gray-800">Join us!</h2>
           <p className="text-gray-600 mt-2">Fuel your curiosity</p>
         </div>
@@ -232,19 +250,20 @@ export default function SignUp() {
         <div className="mt-6 text-center">
           <p className="text-gray-600">
             Already have account?{" "}
-            <button
-              onClick={() => setCurrentView("login")}
-              className="text-sm border-0 bg-gradient-to-r from-purple-600 to-blue-600 hover:bg-purple-700 font-semibold transition-all duration-200 transform hover:scale-105"
-            >
-              Log In
-            </button>
+            <NavLink to="/login" end>
+              <button className="text-sm border-0 bg-gradient-to-r from-purple-600 to-blue-600 hover:bg-purple-700 font-semibold transition-all duration-200 transform hover:scale-105">
+                Log In
+              </button>
+            </NavLink>
           </p>
-          <button
-            onClick={() => setCurrentView("home")}
-            className="text-sm m-2 border-0 bg-gradient-to-r from-purple-600 to-blue-600 hover:bg-purple-700 font-semibold transition-all duration-200 transform hover:scale-105"
-          >
-            Go back to homepage
-          </button>
+          <NavLink to="/homepage" end>
+            <button
+              onClick={() => setCurrentView("home")}
+              className="text-sm m-2 border-0 bg-gradient-to-r from-purple-600 to-blue-600 hover:bg-purple-700 font-semibold transition-all duration-200 transform hover:scale-105"
+            >
+              Go back to homepage
+            </button>
+          </NavLink>
         </div>
       </div>
     </div>

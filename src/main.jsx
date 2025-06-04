@@ -10,6 +10,7 @@ import LogIn from "./components/forms/LogIn";
 import Protected from "./components/layout/Protected.jsx";
 import RequireAuth from "./components/common/RequireAuth.jsx";
 import ProtectedRoutes from "./components/common/ProtectedRoutes.jsx";
+import MyProfile from "./components/layout/MyProfile.jsx";
 
 const router = createBrowserRouter([
   {
@@ -26,7 +27,7 @@ const router = createBrowserRouter([
             <ProtectedRoutes />
           </RequireAuth>
         ),
-        children: [{ path: "protected", element: <Protected /> }],
+        children: [{ path: "me", element: <MyProfile /> }],
       },
     ],
   },

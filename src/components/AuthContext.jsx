@@ -14,8 +14,12 @@ export function AuthProvider({ children }) {
   const loginUser = (userData) => {
     setUser(userData);
   };
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Check if user is already logged in
+    const savedUser = localStorage.getItem("user");
+
     // Fetch user profile on component mount
     const fetchUserProfile = async () => {
       try {
@@ -33,10 +37,13 @@ export function AuthProvider({ children }) {
       } catch (error) {
         console.error("Failed to fetch user profile:", error);
         setUser(null);
+      } finally {
+        setLoading(false);
       }
     };
     fetchUserProfile();
   }, []);
+  console.log("User in AuthContext:", user);
 
   // Change the document's class based on darkMode state
   useEffect(() => {
@@ -50,7 +57,7 @@ export function AuthProvider({ children }) {
   }, [darkMode]);
 
   return (
-    <AuthContext.Provider value={{ darkMode, toggleDarkMode, user, loginUser }}>
+    <AuthContext.Provider value={{ darkMode, toggleDarkMode, user, loginUser, loading }}>
       {children}
     </AuthContext.Provider>
   );

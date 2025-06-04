@@ -22,28 +22,28 @@ import {
   Moon,
 } from "lucide-react";
 
-export default function Navbar() {
+export default function Sidebar() {
   const { darkMode, toggleDarkMode, user, loginUser } = useContext(AuthContext);
 
-  const handleLogout = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await fetch(`${apiUrl}/auth/logout`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-      });
-      const data = await res.json();
-      if (data.success) {
-        // Clear user data and redirect to login page
-        loginUser(null);
-        localStorage.removeItem("user");
-        window.location.href = "/login"; // Redirect to login page
-      }
-    } catch (error) {
-      console.error("Failed to log out:", error);
-    }
-  };
+  //   const handleLogout = async (e) => {
+  //     e.preventDefault();
+  //     try {
+  //       const res = await fetch(`${apiUrl}/auth/logout`, {
+  //         method: "POST",
+  //         headers: { "Content-Type": "application/json" },
+  //         credentials: "include",
+  //       });
+  //       const data = await res.json();
+  //       if (data.success) {
+  //         // Clear user data and redirect to login page
+  //         loginUser(null);
+  //         window.location.href = "/login"; // Redirect to login page
+  //       }
+  //     } catch (error) {
+  //       console.error("Failed to log out:", error);
+  //     }
+  //   };
+
   return (
     <header className="bg-white dark:bg-dark_background shadow-sm border-b border-background dark:border-dark_background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-4">

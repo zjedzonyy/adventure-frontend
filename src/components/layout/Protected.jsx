@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { AuthContext } from "../AuthContext.jsx";
-import Navbar from "../Navbar.jsx";
+import Navbar from "../common/Navbar.jsx";
 import LogIn from "../forms/LogIn.jsx";
 
 export default function Protected() {

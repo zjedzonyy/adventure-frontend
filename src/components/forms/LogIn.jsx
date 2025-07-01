@@ -27,7 +27,7 @@ export default function LogIn() {
     password: "",
   });
   const [demoData, setDemoData] = useState({
-    username: "DemoUser",
+    username: "TestUser2",
     password: "Password1",
   });
   const [showPassword, setShowPassword] = useState(false);

@@ -11,6 +11,12 @@ import Protected from "./components/layout/Protected.jsx";
 import RequireAuth from "./components/common/RequireAuth.jsx";
 import ProtectedRoutes from "./components/common/ProtectedRoutes.jsx";
 import MyProfile from "./components/layout/MyProfile.jsx";
+import Settings from "./components/layout/Settings.jsx";
+import Idea from "./components/layout/Idea.jsx";
+import SearchIdeas from "./components/layout/SearchIdeas.jsx";
+import AddIdea from "./components/layout/AddIdea.jsx";
+import EditIdea from "./components/layout/EditIdea.jsx";
+import UsersProfile from "./components/layout/UsersProfile.jsx";
 
 const router = createBrowserRouter([
   {
@@ -27,7 +33,14 @@ const router = createBrowserRouter([
             <ProtectedRoutes />
           </RequireAuth>
         ),
-        children: [{ path: "me", element: <MyProfile /> }],
+        children: [
+          { path: "profile/:userId", element: <UsersProfile /> },
+          { path: "settings", element: <Settings /> },
+          { path: "idea/:ideaId", element: <Idea /> },
+          { path: "/ideas/search", element: <SearchIdeas /> },
+          { path: "/add-idea", element: <AddIdea /> },
+          { path: "/edit-idea/:ideaId", element: <EditIdea /> },
+        ],
       },
     ],
   },

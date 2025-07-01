@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { apiUrl } from "../utils/api.js";
 import { AuthContext } from "./AuthContext.jsx";
-import Navbar from "./Navbar.jsx";
+import Navbar from "./common/Navbar.jsx";
 import {
   Search,
   Compass,
@@ -20,6 +20,8 @@ import {
   Sun,
   Moon,
 } from "lucide-react";
+import Footer from "./common/Footer.jsx";
+
 export default function Homepage() {
   const { darkMode, toggleDarkMode } = React.useContext(AuthContext);
 
@@ -262,98 +264,7 @@ export default function Homepage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="bg-gradient-to-r from-purple-600 to-blue-600 w-8 h-8 rounded-lg flex items-center justify-center">
-                  <Compass className="w-4 h-4 text-white" />
-                </div>
-                <span className="text-xl font-bold">DiscoverIt</span>
-              </div>
-              <p className="text-gray-400 mb-6">
-                Discover new possibilities and share your ideas with the world.
-              </p>
-              <div className="space-y-3">
-                <h5 className="font-semibold text-white">Platform</h5>
-                <ul className="space-y-2 text-gray-400">
-                  <li>
-                    <a href="#" className="hover:text-white transition-colors">
-                      Popular Ideas
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-white transition-colors">
-                      Latest
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-white transition-colors">
-                      Categories
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-white transition-colors">
-                      Community
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div>
-              <h5 className="font-semibold mb-4 text-white">Support</h5>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Help Center
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    FAQ
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Guidelines
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Terms of Service
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Privacy Policy
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Cookie Policy
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h5 className="font-semibold mb-4 text-white">Contact</h5>
-              <div className="space-y-3 text-gray-400">
-                <div className="flex items-center space-x-3">
-                  <Mail className="w-4 h-4" />
-                  <span>hello@discoverit.com</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <User className="w-4 h-4" />
-                  <span>@discoverit</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

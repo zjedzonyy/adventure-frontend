@@ -1,15 +1,24 @@
 import { createContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiUrl } from "../utils/api.js";
+import { getFilters } from "../utils/getFilters.js";
 
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
   };
   const [user, setUser] = useState(null);
+  const [labels, setLabels] = useState({
+    categories: [],
+    durations: [],
+    priceRanges: [],
+    groups: [],
+    locationTypes: [],
+    statusTypes: [],
+  });
 
   const loginUser = (userData) => {
     setUser(userData);
@@ -43,7 +52,20 @@ export function AuthProvider({ children }) {
     };
     fetchUserProfile();
   }, []);
-  console.log("User in AuthContext:", user);
+
+  useEffect(() => {
+    // Fetch labels for ideas when user is logged in
+    const fetchLabels = async () => {
+      console;
+      try {
+        const filters = await getFilters();
+        setLabels(filters);
+      } catch (error) {
+        console.error("Failed to fetch labels:", error);
+      }
+    };
+    fetchLabels();
+  }, []);
 
   // Change the document's class based on darkMode state
   useEffect(() => {
@@ -57,7 +79,7 @@ export function AuthProvider({ children }) {
   }, [darkMode]);
 
   return (
-    <AuthContext.Provider value={{ darkMode, toggleDarkMode, user, loginUser, loading }}>
+    <AuthContext.Provider value={{ darkMode, toggleDarkMode, user, loginUser, loading, labels }}>
       {children}
     </AuthContext.Provider>
   );

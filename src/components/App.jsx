@@ -1,7 +1,5 @@
-import { useState } from "react";
 import { Outlet } from "react-router-dom";
-import Navbar from "./common/Navbar";
-import { AuthProvider } from "./AuthContext";
+import { AuthProvider } from "./auth/index";
 
 function App() {
   return (

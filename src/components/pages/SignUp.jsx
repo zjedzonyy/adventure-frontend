@@ -17,7 +17,7 @@ import {
   Sun,
   Moon,
 } from "lucide-react";
-import { AuthContext } from "../AuthContext.jsx";
+import { AuthContext } from "../auth/index.js";
 
 export default function SignUp() {
   const [registerData, setRegisterData] = useState({

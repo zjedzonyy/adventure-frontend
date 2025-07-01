@@ -1,9 +1,10 @@
-import Navbar from "../common/Navbar";
-import Footer from "../common/Footer";
-import React, { useState, useEffect, useContext } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { AuthContext } from "../AuthContext.jsx";
-import { apiUrl } from "../../utils/api.js";
+import React, { useState, useEffect, useContext, use } from "react";
+import { useNavigate } from "react-router-dom";
+
+import { AuthContext } from "../auth/index.js";
+import { Navbar, Footer } from "../layout/index.js";
+import { apiUrl } from "../../utils/index.js";
+
 import {
   Plus,
   User,
@@ -18,10 +19,8 @@ import {
   EyeOff,
   AlertCircle,
   Check,
-  Edit,
 } from "lucide-react";
 export default function AddIdea() {
-  const { ideaId } = useParams();
   const { user, darkMode, labels } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -34,7 +33,7 @@ export default function AddIdea() {
     categories: [],
     groups: [],
     priceRangeId: "",
-    locationType: "FLEXIBLE",
+    locationType: "",
   });
 
   const [availableOptions, setAvailableOptions] = useState({
@@ -50,54 +49,11 @@ export default function AddIdea() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
-  // Initialize available options from labels and Idea data
+  // Initialize available options from labels
   useEffect(() => {
     if (labels) {
       setAvailableOptions(labels);
     }
-
-    const fetchIdeaData = async () => {
-      try {
-        const response = await fetch(`${apiUrl}/ideas/${ideaId}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch idea data");
-        }
-
-        const data = await response.json();
-        console.log("Fetched idea data:", data);
-        if (data.success) {
-          setFormData({
-            title: data.data?.title || "",
-            description: data.data?.description || "",
-            isActive: typeof data.data?.isActive === "boolean" ? data.data.isActive : true,
-            isChallenge:
-              typeof data.data?.isChallenge === "boolean" ? data.data.isChallenge : false,
-            durationId: data.data?.duration?.id || "",
-            categories: Array.isArray(data.data?.categories)
-              ? data.data.categories.map((cat) => cat.id)
-              : [],
-            groups: Array.isArray(data.data?.groupSizes)
-              ? data.data.groupSizes.map((grp) => grp.id)
-              : [],
-            priceRangeId: data.data?.priceRange?.id || "",
-            locationType: data.data?.locationType || "FLEXIBLE",
-          });
-        } else {
-          setErrors({ general: data.message || "Failed to load idea" });
-        }
-      } catch (error) {
-        console.error("Error fetching idea:", error);
-        setErrors({ general: "An error occurred while fetching the idea" });
-      }
-    };
-    fetchIdeaData();
   }, [labels]);
 
   const validateForm = () => {
@@ -186,8 +142,8 @@ export default function AddIdea() {
         priceRangeId: parseInt(formData.priceRangeId),
       };
 
-      const response = await fetch(`${apiUrl}/ideas/${ideaId}`, {
-        method: "PUT",
+      const response = await fetch(`${apiUrl}/ideas`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
@@ -229,7 +185,7 @@ export default function AddIdea() {
           </div>
           <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">Success!</h2>
           <p className="text-gray-600 dark:text-gray-400">
-            Your idea has been updated successfully. Redirecting...
+            Your idea has been created successfully. Redirecting...
           </p>
         </div>
       </div>
@@ -244,9 +200,12 @@ export default function AddIdea() {
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8">
           <div className="text-center mb-8">
             <div className="bg-gradient-to-r from-purple-600 to-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Edit className="w-8 h-8 text-white" />
+              <Plus className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Edit Idea</h1>
+            <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Add New Idea</h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">
+              Share your creative idea with the community
+            </p>
           </div>
 
           {errors.general && (
@@ -492,12 +451,12 @@ export default function AddIdea() {
                 {isSubmitting ? (
                   <>
                     <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div>
-                    Editing Idea...
+                    Creating Idea...
                   </>
                 ) : (
                   <>
-                    <Edit className="w-5 h-5 mr-2" />
-                    Edit Idea
+                    <Plus className="w-5 h-5 mr-2" />
+                    Create Idea
                   </>
                 )}
               </button>

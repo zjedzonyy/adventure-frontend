@@ -18,7 +18,7 @@ import {
   Sun,
   Moon,
 } from "lucide-react";
-import { AuthContext } from "../AuthContext.jsx";
+import { AuthContext } from "../auth/index";
 
 export default function LogIn() {
   const [error, setError] = useState("");

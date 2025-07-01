@@ -1,0 +1,11 @@
+export { default as Homepage } from "./Homepage";
+export { default as ErrorPage } from "./ErrorPage";
+export { default as Protected } from "./Protected";
+export { default as AddIdea } from "./AddIdea";
+export { default as EditIdea } from "./EditIdea";
+export { default as Idea } from "./Idea";
+export { default as SearchIdeas } from "./SearchIdeas";
+export { default as SignUp } from "./SignUp";
+export { default as LogIn } from "./LogIn";
+export { default as UsersProfile } from "./UsersProfile";
+export { default as Settings } from "./Settings";

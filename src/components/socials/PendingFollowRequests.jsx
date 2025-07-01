@@ -1,10 +1,9 @@
-import { AuthContext } from "../AuthContext";
-import React, { useContext, useEffect, useState } from "react";
-import { apiUrl } from "../../utils/api.js";
-import AnimatedList from "../common/AnimatedList.jsx";
-import { User, Check, X, UserPlus, Users, ChevronDown } from "lucide-react";
-import FollowRequestItem from "./FollowRequestItem.jsx";
-import DropdownSection from "../common/DropdownSection.jsx";
+import { useEffect, useState } from "react";
+
+import { DropdownSection, FollowRequestItem } from "../socials/index.js";
+import { apiUrl } from "../../utils/index.js";
+
+import { Users } from "lucide-react";
 
 export default function PendingFollowRequests({ isExpanded, setIsExpanded }) {
   const [followingRequests, setFollowingRequests] = useState([]);

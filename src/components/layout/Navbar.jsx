@@ -1,9 +1,10 @@
-import { Link } from "react-router-dom";
 import { NavLink } from "react-router-dom";
-import { apiUrl } from "../../utils/api.js";
-import React, { useContext } from "react";
-import UserSearchBar from "./UserSearchBar.jsx";
-import { AuthContext } from "../AuthContext.jsx";
+import { useContext } from "react";
+
+import { AuthContext } from "../auth/index.js";
+import { UserSearchBar } from "../common/index.js";
+import { apiUrl } from "../../utils/index.js";
+
 import {
   Search,
   Compass,

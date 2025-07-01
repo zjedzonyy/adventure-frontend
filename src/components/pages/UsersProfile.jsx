@@ -1,9 +1,21 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { AuthContext } from "../AuthContext.jsx";
-import Navbar from "../common/Navbar.jsx";
-import { apiUrl } from "../../utils/api.js";
-import Footer from "../common/Footer.jsx";
+
+import { AuthContext, AuthProvider, ProtectedRoutes, RequireAuth } from "../auth/index.js";
+import { Navbar, Footer, MainBackground } from "../layout/index.js";
+import { SortComponent, UserSearchBar } from "../common/index.js";
+import { Comments, IdeaCard } from "../ideas/index.js";
+import {
+  DropdownSection,
+  Followers,
+  Followings,
+  FollowRequestItem,
+  PendingFollowRequests,
+  SentFollowRequests,
+} from "../socials/index.js";
+import { AnimatedList, StarRating } from "../ui/index.js";
+import { apiUrl, getFilters } from "../../utils/index.js";
+
 import {
   Heart,
   Star,

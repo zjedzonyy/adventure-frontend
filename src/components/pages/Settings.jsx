@@ -1,13 +1,12 @@
-import Navbar from "../common/Navbar";
-import Footer from "../common/Footer.jsx";
-import { AuthContext } from "../AuthContext";
-import React, { useContext, useEffect, useState } from "react";
-import { apiUrl } from "../../utils/api.js";
-import { User, Check, X, UserPlus, Users, ChevronDown } from "lucide-react";
-import PendingFollowRequests from "../common/PendingFollowRequests.jsx";
-import SentFollowRequests from "../common/SentFollowRequests.jsx";
-import Followers from "../common/Followers.jsx";
-import Followings from "../common/Followings.jsx";
+import { AuthContext } from "../auth/index.js";
+import { Navbar, Footer } from "../layout/index.js";
+import {
+  PendingFollowRequests,
+  SentFollowRequests,
+  Followers,
+  Followings,
+} from "../socials/index.js";
+import { useContext, useState } from "react";
 
 export default function Settings() {
   const { user } = useContext(AuthContext);

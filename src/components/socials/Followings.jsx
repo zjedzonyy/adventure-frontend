@@ -1,31 +1,37 @@
-import { AuthContext } from "../AuthContext";
-import React, { useContext, useEffect, useState } from "react";
-import { apiUrl } from "../../utils/api.js";
-import AnimatedList from "../common/AnimatedList.jsx";
-import { User, Check, X, UserPlus, Users, ChevronDown, Send } from "lucide-react";
-import FollowRequestItem from "./FollowRequestItem.jsx";
-import DropdownSection from "../common/DropdownSection.jsx";
+import { useContext, useEffect, useState } from "react";
+import { Eye } from "lucide-react";
 
-export default function PendingFollowRequests({ isExpanded, setIsExpanded }) {
-  const [requests, setRequests] = useState([]);
+import { AuthContext } from "../auth/index.js";
+import { DropdownSection, FollowRequestItem } from "./index.js";
+import { apiUrl } from "../../utils/index.js";
+
+import { useParams } from "react-router-dom";
+
+export default function Followings({ isExpanded, setIsExpanded }) {
+  const { user } = useContext(AuthContext);
+  const { userId } = useParams();
+
+  const [followings, setFollowings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [processingIds, setProcessingIds] = useState(new Set());
+  const userIdFixed = userId ? userId : user.id;
 
+  // Fetch followings
   useEffect(() => {
     const fetchrequests = async () => {
       try {
-        const response = await fetch(`${apiUrl}/users/me/sent-follow-requests`, {
+        const response = await fetch(`${apiUrl}/follows/${userIdFixed}/followings`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
         });
         if (!response.ok) {
-          throw new Error("Failed to fetch following requests");
+          throw new Error("Failed to fetch followings");
         }
         const data = await response.json();
         if (response.ok) {
-          setRequests(data.data);
+          setFollowings(data.data);
         }
       } catch (err) {
         setError(err.message);
@@ -36,17 +42,18 @@ export default function PendingFollowRequests({ isExpanded, setIsExpanded }) {
     fetchrequests();
   }, []);
 
-  const onCancel = async (requestId) => {
-    setProcessingIds((prev) => new Set(prev).add(requestId));
+  // Sop following user
+  const onCancel = async (followingsId) => {
+    setProcessingIds((prev) => new Set(prev).add(followingsId));
     try {
-      const response = await fetch(`${apiUrl}/follow-requests/sent/${requestId}`, {
+      const response = await fetch(`${apiUrl}/follows/${followingsId}/unfollow`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
       });
       const data = await response.json();
       if (data.success) {
-        setRequests((prev) => prev.filter((request) => request.id !== requestId));
+        setFollowings((prev) => prev.filter((request) => request.followingsId !== followingsId));
       } else {
         throw new Error(data.message || "Failed to reject follow request");
       }
@@ -55,32 +62,31 @@ export default function PendingFollowRequests({ isExpanded, setIsExpanded }) {
     } finally {
       setProcessingIds((prev) => {
         const copy = new Set(prev);
-        copy.delete(requestId);
+        copy.delete(followingsId);
         return copy;
       });
     }
   };
 
-  console.log("Sent Follow Requests:", requests);
   return (
     <div className="w-full">
       <DropdownSection
-        title="Sent Follow Requests"
-        icon={Send}
+        title="Followings"
+        icon={Eye}
         isExpanded={isExpanded}
         onToggle={() => setIsExpanded(!isExpanded)}
-        count={requests.length}
+        count={followings.length}
       >
         {error && <div className="text-red-500 text-sm">⚠ {error}</div>}
 
-        {requests.length === 0 ? (
-          <p className="text-gray-500 text-sm">{loading ? "Loading..." : "No requests"}</p>
+        {followings.length === 0 ? (
+          <p className="text-gray-500 text-sm">{loading ? "Loading..." : "No followings"}</p>
         ) : (
-          requests.map((request) => (
+          followings.map((request) => (
             <FollowRequestItem
-              key={request.id}
-              username={request.toUsername}
-              id={request.id}
+              key={request.followingId}
+              username={request.followingUsername}
+              id={request.followingId}
               onReject={onCancel}
               isProcessing={processingIds.has(request.id)}
             />

@@ -3,20 +3,20 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./components/App.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-
-import Homepage from "./components/Homepage";
-import SignUp from "./components/forms/SignUp";
-import LogIn from "./components/forms/LogIn";
-import Protected from "./components/layout/Protected.jsx";
-import RequireAuth from "./components/common/RequireAuth.jsx";
-import ProtectedRoutes from "./components/common/ProtectedRoutes.jsx";
-import MyProfile from "./components/layout/MyProfile.jsx";
-import Settings from "./components/layout/Settings.jsx";
-import Idea from "./components/layout/Idea.jsx";
-import SearchIdeas from "./components/layout/SearchIdeas.jsx";
-import AddIdea from "./components/layout/AddIdea.jsx";
-import EditIdea from "./components/layout/EditIdea.jsx";
-import UsersProfile from "./components/layout/UsersProfile.jsx";
+import {
+  Homepage,
+  ErrorPage,
+  Protected,
+  AddIdea,
+  EditIdea,
+  Idea,
+  SearchIdeas,
+  LogIn,
+  SignUp,
+  UsersProfile,
+  Settings,
+} from "./components/pages";
+import { RequireAuth, ProtectedRoutes } from "./components/auth/index.js";
 
 const router = createBrowserRouter([
   {

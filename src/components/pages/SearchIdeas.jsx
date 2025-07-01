@@ -1,20 +1,9 @@
-import Navbar from "../common/Navbar";
-import Footer from "../common/Footer";
-import { use, useEffect, useState } from "react";
+import { Navbar, Footer } from "../layout/index.js";
+import { IdeaCard } from "../ideas/index.js";
+import { useEffect, useState } from "react";
 import { apiUrl } from "../../utils/api";
-import IdeaCard from "../common/IdeaCard";
-import {
-  ChevronDown,
-  ChevronUp,
-  Loader2,
-  Filter,
-  X,
-  ChevronLeft,
-  ChevronRight,
-  Award,
-  Eye,
-  CheckCircle,
-} from "lucide-react";
+
+import { Filter, X, ChevronLeft, ChevronRight, Award } from "lucide-react";
 
 export default function SearchIdeas() {
   const [filters, setFilters] = useState({});

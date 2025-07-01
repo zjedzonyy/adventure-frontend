@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { AuthContext } from "../AuthContext.jsx";
-import { apiUrl } from "../../utils/api.js";
-import SortComponent from "./SortComponent.jsx";
+import { useContext, useState } from "react";
+import { AuthContext } from "../auth/index.js";
+import { SortComponent } from "../common/index.js";
+import { apiUrl } from "../../utils/index.js";
+
 import {
   User,
   Calendar,
@@ -26,7 +26,6 @@ export default function Comments({
   handleLikeComment,
   commentsCount,
   setClicked,
-  commentSortChange,
   setCommentSortChange,
   commentSort,
   setCommentSort,

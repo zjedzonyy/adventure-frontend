@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { NavLink } from "react-router-dom";
-import { apiUrl } from "../utils/api.js";
-import { AuthContext } from "./AuthContext.jsx";
-import Navbar from "./common/Navbar.jsx";
+import React from "react";
+import { AuthContext } from "../auth/index.js";
+import { Navbar, Footer } from "../layout/index.js";
+
 import {
   Search,
   Compass,
@@ -20,7 +19,6 @@ import {
   Sun,
   Moon,
 } from "lucide-react";
-import Footer from "./common/Footer.jsx";
 
 export default function Homepage() {
   const { darkMode, toggleDarkMode } = React.useContext(AuthContext);

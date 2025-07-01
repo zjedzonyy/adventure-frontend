@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import { apiUrl } from "../../utils/index.js";
+
+import { useState, useEffect, useRef } from "react";
 import { Search, User, X } from "lucide-react";
-import { apiUrl } from "../../utils/api.js";
 
 export default function UserSearchBar() {
   const [searchQuery, setSearchQuery] = useState("");

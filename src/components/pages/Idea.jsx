@@ -1,14 +1,14 @@
 import React, { use, useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { AuthContext } from "../AuthContext.jsx";
-import Navbar from "../common/Navbar.jsx";
-import Footer from "../common/Footer.jsx";
-import { apiUrl } from "../../utils/api.js";
-import Comments from "../common/Comments.jsx";
-import StarRating from "../common/StarRating.jsx";
+
+import { AuthContext } from "../auth/index.js";
+import { Navbar, Footer, MainBackground } from "../layout/index.js";
+import { Comments } from "../ideas/index.js";
+import { StarRating } from "../ui/index.js";
+import { apiUrl } from "../../utils/index.js";
+
 import {
   Heart,
-  Star,
   User,
   Calendar,
   MapPin,
@@ -16,20 +16,12 @@ import {
   Users,
   DollarSign,
   Eye,
-  MessageCircle,
-  Send,
-  ThumbsUp,
-  Flag,
-  Edit3,
-  Trash2,
   Award,
   Target,
   CheckCircle,
   BookmarkPlus,
   Share2,
   Play,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 
 export default function Idea() {

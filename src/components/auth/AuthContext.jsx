@@ -1,9 +1,8 @@
+import { apiUrl, getFilters } from "../../utils/index.js";
 import { createContext, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { apiUrl } from "../utils/api.js";
-import { getFilters } from "../utils/getFilters.js";
 
-export const AuthContext = createContext();
+const AuthContext = createContext();
+export default AuthContext;
 
 export function AuthProvider({ children }) {
   const [darkMode, setDarkMode] = useState(false);
@@ -56,7 +55,6 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     // Fetch labels for ideas when user is logged in
     const fetchLabels = async () => {
-      console;
       try {
         const filters = await getFilters();
         setLabels(filters);

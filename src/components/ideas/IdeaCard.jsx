@@ -1,6 +1,7 @@
 import { Star, ClipboardCheck, Edit3 } from "lucide-react";
-import { AuthContext } from "../AuthContext";
+import { AuthContext } from "../auth/index.js";
 import { useContext } from "react";
+
 export default function IdeaCard({ idea }) {
   const { user } = useContext(AuthContext);
   return (

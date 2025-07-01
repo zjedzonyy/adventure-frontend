@@ -1,19 +1,5 @@
-import {
-  ChevronDown,
-  ChevronUp,
-  Loader2,
-  Filter,
-  X,
-  Calendar,
-  MapPin,
-  Clock,
-  DollarSign,
-  Users,
-  Award,
-  Eye,
-  CheckCircle,
-} from "lucide-react";
-import React, { useState, useEffect, useRef } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 
 export default function SortComponent({
   currentSort,

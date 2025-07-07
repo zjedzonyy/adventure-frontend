@@ -30,7 +30,7 @@ export default function Comments({
   commentSort,
   setCommentSort,
 }) {
-  const { user } = useContext(AuthContext);
+  const { user, avatarUrl } = useContext(AuthContext);
   const [editedCommentId, setEditedCommentId] = useState(null);
   const [editedContent, setEditedContent] = useState("");
   const startEditing = (comment) => {
@@ -115,7 +115,18 @@ export default function Comments({
           <div className="mb-12">
             <div className="flex space-x-4">
               <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                <User className="w-5 h-5 text-white" />
+                {/* Avatar */}
+                {avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt={user.username}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
+                    <User className="w-8 h-8 text-white" />
+                  </div>
+                )}
               </div>
               <div className="flex-1 text-text_secondary dark:text-text_primary">
                 <textarea
@@ -156,7 +167,18 @@ export default function Comments({
             >
               <div className="flex-shrink-0">
                 <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
-                  <User className="w-5 h-5 text-white" />
+                  {/* Avatar */}
+                  {comment.author.avatarUrl ? (
+                    <img
+                      src={comment.author.avatarUrl}
+                      alt={comment.author.username}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
+                      <User className="w-8 h-8 text-white" />
+                    </div>
+                  )}
                 </div>
               </div>
 

@@ -11,6 +11,8 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.50.3",
+    "@uiw/react-md-editor": "^4.0.7",
     "framer-motion": "^12.19.2",
     "lucide-react": "^0.511.0",
     "modern-normalize": "^3.0.1",

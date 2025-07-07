@@ -10,7 +10,7 @@ export default function SettingsSection({
   children,
 }) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 mb-6">
+    <div className="w-[75vw] mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 mb-6">
       <div
         onClick={onToggle}
         className="flex items-center justify-between cursor-pointer select-none px-4 py-3"

@@ -122,43 +122,112 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500 dark:from-purple-900 dark:via-blue-900 dark:to-cyan-800 flex items-center justify-center p-4 relative">
-      {" "}
+    <div
+      className={`min-h-screen transition-all duration-500 ease-in-out flex items-center justify-center p-4 relative ${
+        darkMode
+          ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
+          : "bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500"
+      }`}
+    >
       <button
         onClick={toggleDarkMode}
-        className="absolute top-6 right-6 p-3 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all duration-200 z-10"
+        className={`absolute top-6 right-6 p-3 rounded-full transition-all duration-300 ease-in-out transform hover:scale-110 hover:rotate-12 z-10 ${
+          darkMode
+            ? "bg-gray-800/60 hover:bg-gray-700/60 backdrop-blur-sm border border-gray-600/30"
+            : "bg-white/20 hover:bg-white/30 backdrop-blur-sm"
+        }`}
       >
         {darkMode ? (
-          <Sun className="w-6 h-6 text-yellow-500" />
+          <Sun className="w-6 h-6 text-yellow-400 transition-all duration-300 ease-in-out" />
         ) : (
-          <Moon className="w-6 h-6 text-gray-600" />
+          <Moon className="w-6 h-6 text-gray-100 transition-all duration-300 ease-in-out" />
         )}
       </button>
-      <div className="bg-white rounded-2xl shadow-2xl px-8 py-4 w-full max-w-md">
-        <div className="text-center mb-4">
-          <div className="bg-gradient-to-r from-purple-600 to-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <User className="w-8 h-8 text-white" />
+
+      <div
+        className={`rounded-2xl shadow-2xl px-8 py-6 w-full max-w-md transition-all duration-500 ease-in-out transform ${
+          darkMode
+            ? "bg-gray-800/90 backdrop-blur-lg border border-gray-700/50"
+            : "bg-white/95 backdrop-blur-lg"
+        }`}
+      >
+        <div className="text-center mb-6">
+          <div
+            className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 transition-all duration-500 ease-in-out transform hover:rotate-12 ${
+              darkMode
+                ? "bg-gradient-to-r from-blue-500 to-purple-600 shadow-lg shadow-blue-500/25"
+                : "bg-gradient-to-r from-purple-600 to-blue-600 shadow-lg shadow-purple-500/25"
+            }`}
+          >
+            <User className="w-8 h-8 text-white transition-all duration-300 ease-in-out" />
           </div>
 
-          <h2 className="text-3xl font-bold text-gray-800">Join us!</h2>
-          <p className="text-gray-600 mt-2">Fuel your curiosity</p>
+          <h2
+            className={`text-3xl font-bold transition-all duration-300 ease-in-out ${
+              darkMode ? "text-white" : "text-gray-800"
+            }`}
+          >
+            Join us!
+          </h2>
+          <p
+            className={`mt-2 transition-all duration-300 ease-in-out ${
+              darkMode ? "text-gray-300" : "text-gray-600"
+            }`}
+          >
+            Fuel your curiosity
+          </p>
         </div>
-        <p className="font-medium text-sm text-red-500">{error.sendData}</p>
-        <p className="font-medium text-sm text-red-500">
-          {backendData.message ? backendData.message : ""}
-        </p>
+
+        {(error.sendData || backendData.message) && (
+          <div
+            className={`p-3 rounded-lg mb-4 transition-all duration-300 ease-in-out ${
+              darkMode
+                ? "bg-red-900/20 border border-red-800/30 text-red-300"
+                : "bg-red-50 border border-red-200 text-red-600"
+            }`}
+          >
+            <div className="flex items-center">
+              <AlertCircle className="w-4 h-4 mr-2" />
+              <span className="font-medium text-sm">{error.sendData || backendData.message}</span>
+            </div>
+          </div>
+        )}
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
-            <p className="font-medium text-sm text-red-500">{error.username}</p>
+            <label
+              className={`block text-sm font-medium mb-2 transition-all duration-300 ease-in-out ${
+                darkMode ? "text-gray-200" : "text-gray-700"
+              }`}
+            >
+              Username
+            </label>
+            {error.username && (
+              <div
+                className={`p-2 rounded-md mb-2 transition-all duration-300 ease-in-out ${
+                  darkMode
+                    ? "bg-red-900/20 border border-red-800/30 text-red-300"
+                    : "bg-red-50 border border-red-200 text-red-600"
+                }`}
+              >
+                <span className="font-medium text-sm">{error.username}</span>
+              </div>
+            )}
 
             <div className="relative">
-              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <User
+                className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 transition-all duration-300 ease-in-out ${
+                  darkMode ? "text-gray-400" : "text-gray-400"
+                }`}
+              />
               <input
                 type="text"
                 required
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className={`w-full pl-10 pr-4 py-3 rounded-lg transition-all duration-300 ease-in-out focus:ring-2 focus:scale-[1.02] ${
+                  darkMode
+                    ? "bg-gray-700/50 border border-gray-600/50 text-white placeholder-gray-400 focus:ring-blue-500/50 focus:border-blue-500/50 focus:bg-gray-700/80"
+                    : "bg-white/80 border border-gray-300 text-gray-900 placeholder-gray-500 focus:ring-purple-500/50 focus:border-transparent focus:bg-white"
+                }`}
                 placeholder="Username"
                 value={registerData.username}
                 onChange={(e) => {
@@ -170,15 +239,39 @@ export default function SignUp() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-            <p className="font-medium text-sm text-red-500">{error.email}</p>
+            <label
+              className={`block text-sm font-medium mb-2 transition-all duration-300 ease-in-out ${
+                darkMode ? "text-gray-200" : "text-gray-700"
+              }`}
+            >
+              Email
+            </label>
+            {error.email && (
+              <div
+                className={`p-2 rounded-md mb-2 transition-all duration-300 ease-in-out ${
+                  darkMode
+                    ? "bg-red-900/20 border border-red-800/30 text-red-300"
+                    : "bg-red-50 border border-red-200 text-red-600"
+                }`}
+              >
+                <span className="font-medium text-sm">{error.email}</span>
+              </div>
+            )}
 
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Mail
+                className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 transition-all duration-300 ease-in-out ${
+                  darkMode ? "text-gray-400" : "text-gray-400"
+                }`}
+              />
               <input
                 type="email"
                 required
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className={`w-full pl-10 pr-4 py-3 rounded-lg transition-all duration-300 ease-in-out focus:ring-2 focus:scale-[1.02] ${
+                  darkMode
+                    ? "bg-gray-700/50 border border-gray-600/50 text-white placeholder-gray-400 focus:ring-blue-500/50 focus:border-blue-500/50 focus:bg-gray-700/80"
+                    : "bg-white/80 border border-gray-300 text-gray-900 placeholder-gray-500 focus:ring-purple-500/50 focus:border-transparent focus:bg-white"
+                }`}
                 placeholder="user@gmail.com"
                 value={registerData.email}
                 onChange={(e) => {
@@ -191,14 +284,38 @@ export default function SignUp() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-            <p className="font-medium text-sm text-red-500">{error.password}</p>
+            <label
+              className={`block text-sm font-medium mb-2 transition-all duration-300 ease-in-out ${
+                darkMode ? "text-gray-200" : "text-gray-700"
+              }`}
+            >
+              Password
+            </label>
+            {error.password && (
+              <div
+                className={`p-2 rounded-md mb-2 transition-all duration-300 ease-in-out ${
+                  darkMode
+                    ? "bg-red-900/20 border border-red-800/30 text-red-300"
+                    : "bg-red-50 border border-red-200 text-red-600"
+                }`}
+              >
+                <span className="font-medium text-sm">{error.password}</span>
+              </div>
+            )}
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Lock
+                className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 transition-all duration-300 ease-in-out ${
+                  darkMode ? "text-gray-400" : "text-gray-400"
+                }`}
+              />
               <input
                 type={showPassword ? "text" : "password"}
                 required
-                className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className={`w-full pl-10 pr-12 py-3 rounded-lg transition-all duration-300 ease-in-out focus:ring-2 focus:scale-[1.02] ${
+                  darkMode
+                    ? "bg-gray-700/50 border border-gray-600/50 text-white placeholder-gray-400 focus:ring-blue-500/50 focus:border-blue-500/50 focus:bg-gray-700/80"
+                    : "bg-white/80 border border-gray-300 text-gray-900 placeholder-gray-500 focus:ring-purple-500/50 focus:border-transparent focus:bg-white"
+                }`}
                 placeholder="minimum 8 characters"
                 value={registerData.password}
                 onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
@@ -209,7 +326,11 @@ export default function SignUp() {
               />
               <button
                 type="button"
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                className={`absolute right-3 top-1/2 transform -translate-y-1/2 transition-all duration-200 ease-in-out hover:scale-110 ${
+                  darkMode
+                    ? "text-gray-400 hover:text-gray-300"
+                    : "text-gray-400 hover:text-gray-600"
+                }`}
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -218,16 +339,43 @@ export default function SignUp() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Confirm password</label>
-            <p className="font-medium text-sm text-red-500">{error.confirmPassword}</p>
+            <label
+              className={`block text-sm font-medium mb-2 transition-all duration-300 ease-in-out ${
+                darkMode ? "text-gray-200" : "text-gray-700"
+              }`}
+            >
+              Confirm password
+            </label>
+            {error.confirmPassword && (
+              <div
+                className={`p-2 rounded-md mb-2 transition-all duration-300 ease-in-out ${
+                  darkMode
+                    ? "bg-red-900/20 border border-red-800/30 text-red-300"
+                    : "bg-red-50 border border-red-200 text-red-600"
+                }`}
+              >
+                <span className="font-medium text-sm">{error.confirmPassword}</span>
+              </div>
+            )}
 
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Lock
+                className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 transition-all duration-300 ease-in-out ${
+                  darkMode ? "text-gray-400" : "text-gray-400"
+                }`}
+              />
               <input
                 type="password"
                 required
-                className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent 
-                ${error.confirmPassword ? "border-2 border-red-400/100" : "border-gray-300"}`}
+                className={`w-full pl-10 pr-4 py-3 rounded-lg transition-all duration-300 ease-in-out focus:ring-2 focus:scale-[1.02] ${
+                  error.confirmPassword
+                    ? darkMode
+                      ? "bg-gray-700/50 border-2 border-red-500/50 text-white placeholder-gray-400 focus:ring-red-500/50 focus:border-red-500/50"
+                      : "bg-white/80 border-2 border-red-400 text-gray-900 placeholder-gray-500 focus:ring-red-500/50 focus:border-red-400"
+                    : darkMode
+                      ? "bg-gray-700/50 border border-gray-600/50 text-white placeholder-gray-400 focus:ring-blue-500/50 focus:border-blue-500/50 focus:bg-gray-700/80"
+                      : "bg-white/80 border border-gray-300 text-gray-900 placeholder-gray-500 focus:ring-purple-500/50 focus:border-transparent focus:bg-white"
+                }`}
                 placeholder="Confirm password"
                 value={confirmPassword}
                 onChange={(e) => {
@@ -240,26 +388,43 @@ export default function SignUp() {
 
           <button
             type="submit"
-            className="w-full border-0 bg-gradient-to-r from-purple-600 to-blue-600 hover:bg-purple-700  text-white py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105  "
+            className={`w-full py-3 rounded-lg font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 ${
+              darkMode
+                ? "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
+                : "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40"
+            }`}
             onClick={handleSubmit}
           >
             Sign Up
           </button>
         </div>
 
-        <div className="mt-6 text-center">
-          <p className="text-gray-600">
+        <div className="mt-6 text-center space-y-3">
+          <p
+            className={`transition-all duration-300 ease-in-out ${
+              darkMode ? "text-gray-300" : "text-gray-600"
+            }`}
+          >
             Already have account?{" "}
             <NavLink to="/login" end>
-              <button className="text-sm border-0 bg-gradient-to-r from-purple-600 to-blue-600 hover:bg-purple-700 font-semibold transition-all duration-200 transform hover:scale-105">
+              <button
+                className={`text-sm px-4 py-2 rounded-lg font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 ${
+                  darkMode
+                    ? "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-md shadow-blue-500/25"
+                    : "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white shadow-md shadow-purple-500/25"
+                }`}
+              >
                 Log In
               </button>
             </NavLink>
           </p>
           <NavLink to="/homepage" end>
             <button
-              onClick={() => setCurrentView("home")}
-              className="text-sm m-2 border-0 bg-gradient-to-r from-purple-600 to-blue-600 hover:bg-purple-700 font-semibold transition-all duration-200 transform hover:scale-105"
+              className={`text-sm px-4 py-2 mt-2 rounded-lg font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 ${
+                darkMode
+                  ? "bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white shadow-md shadow-gray-500/25"
+                  : "bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-400 hover:to-gray-500 text-white shadow-md shadow-gray-500/25"
+              }`}
             >
               Go back to homepage
             </button>

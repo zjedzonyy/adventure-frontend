@@ -1,20 +1,9 @@
 import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { AuthContext, AuthProvider, ProtectedRoutes, RequireAuth } from "../auth/index.js";
-import { Navbar, Footer, MainBackground } from "../layout/index.js";
-import { SortComponent, UserSearchBar } from "../common/index.js";
-import { Comments, IdeaCard } from "../ideas/index.js";
-import {
-  DropdownSection,
-  Followers,
-  Followings,
-  FollowRequestItem,
-  PendingFollowRequests,
-  SentFollowRequests,
-} from "../socials/index.js";
-import { AnimatedList, StarRating } from "../ui/index.js";
-import { apiUrl, getFilters } from "../../utils/index.js";
+import { AuthContext } from "../auth/index.js";
+import { Navbar, Footer } from "../layout/index.js";
+import { apiUrl } from "../../utils/index.js";
 
 import {
   Heart,
@@ -34,6 +23,7 @@ import {
   Lock,
   Eye,
 } from "lucide-react";
+import { a } from "framer-motion/client";
 
 export default function UsersProfile() {
   const { userId } = useParams(); // Get user ID from URL params
@@ -210,7 +200,18 @@ export default function UsersProfile() {
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-6">
               <div className="text-center">
                 <div className="w-24 h-24 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <User className="w-12 h-12 text-white" />
+                  {/* Avatar */}
+                  {userData.avatarUrl ? (
+                    <img
+                      src={userData.avatarUrl}
+                      alt={userData.username}
+                      className="w-24 h-24 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-24 h-24 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
+                      <User className="w-12 h-12 text-white" />
+                    </div>
+                  )}
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                   {userData?.username}
@@ -309,10 +310,12 @@ export default function UsersProfile() {
                     />
                   </h3>
                   {isOwnProfile && (
-                    <button className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center space-x-2">
-                      <Plus className="w-4 h-4" />
-                      <span>Add Idea</span>
-                    </button>
+                    <a href="/add-idea">
+                      <button className="min-w-[100px] text-center bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center space-x-2">
+                        <Plus className="w-4 h-4" />
+                        <span>Add</span>
+                      </button>
+                    </a>
                   )}
                 </div>
                 {isExpanded && (
@@ -388,10 +391,12 @@ export default function UsersProfile() {
                       className={`ml-2 w-4 h-4 transition-transform ${todoExpanded ? "rotate-180" : ""}`}
                     />
                   </h3>
-                  <button className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors flex items-center space-x-2">
-                    <Plus className="w-4 h-4" />
-                    <span>Add New</span>
-                  </button>
+                  <a href="/ideas/search">
+                    <button className=" min-w-[100px] text-center bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors flex items-center space-x-2">
+                      <Plus className="w-4 h-4" />
+                      <span>Search</span>
+                    </button>
+                  </a>
                 </div>
                 {todoExpanded && (
                   <div className="space-y-4">

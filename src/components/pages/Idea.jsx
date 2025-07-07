@@ -1,5 +1,6 @@
 import React, { use, useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import MDEditor from "@uiw/react-md-editor";
 
 import { AuthContext } from "../auth/index.js";
 import { Navbar, Footer, MainBackground } from "../layout/index.js";
@@ -333,7 +334,18 @@ export default function Idea() {
             <div className="flex flex-wrap items-center justify-between gap-y-4 mb-8 pb-6 border-b dark:border-gray-700">
               <div className="flex items-center space-x-4 w-full sm:w-auto">
                 <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
-                  <User className="w-6 h-6 text-white" />
+                  {/* Avatar */}
+                  {ideaData.author.avatarUrl ? (
+                    <img
+                      src={ideaData.author.avatarUrl}
+                      alt={ideaData.author.username}
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
+                      <User className="w-8 h-8 text-white" />
+                    </div>
+                  )}
                 </div>
                 <div>
                   <p className="font-semibold text-gray-900 dark:text-white text-lg">
@@ -456,15 +468,10 @@ export default function Idea() {
                 Step-by-step Instructions
               </h2>
               <div className="prose prose-lg dark:prose-invert max-w-none">
-                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 min-h-[400px] flex items-center justify-center">
-                  <p className="text-gray-500 dark:text-gray-400 text-center">
-                    Detailed step-by-step instructions will be displayed here.
-                    <br />
-                    This section will contain comprehensive guidance on how to implement this idea,
-                    <br />
-                    including all necessary steps, tips, and potential considerations.
-                  </p>
-                </div>
+                <MDEditor.Markdown
+                  source={ideaData.detailedDescription}
+                  style={{ whiteSpace: "pre-wrap" }}
+                />
               </div>
             </div>
           </div>

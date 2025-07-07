@@ -15,6 +15,8 @@ import {
   SignUp,
   UsersProfile,
   Settings,
+  RouterErrorBoundary,
+  EditAccount,
 } from "./components/pages";
 import { RequireAuth, ProtectedRoutes } from "./components/auth/index.js";
 
@@ -24,7 +26,7 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       { path: "/", element: <Homepage /> },
-      { path: "homepage", element: <Homepage /> },
+      { path: "homepage", element: <Homepage />, errorElement: <RouterErrorBoundary /> },
       { path: "signup", element: <SignUp /> },
       { path: "login", element: <LogIn /> },
       {
@@ -37,9 +39,11 @@ const router = createBrowserRouter([
           { path: "profile/:userId", element: <UsersProfile /> },
           { path: "settings", element: <Settings /> },
           { path: "idea/:ideaId", element: <Idea /> },
-          { path: "/ideas/search", element: <SearchIdeas /> },
-          { path: "/add-idea", element: <AddIdea /> },
-          { path: "/edit-idea/:ideaId", element: <EditIdea /> },
+          { path: "ideas/search", element: <SearchIdeas /> },
+          { path: "add-idea", element: <AddIdea /> },
+          { path: "edit-idea/:ideaId", element: <EditIdea /> },
+          { path: "edit-account", element: <EditAccount /> },
+          { path: "*", element: <RouterErrorBoundary /> },
         ],
       },
     ],

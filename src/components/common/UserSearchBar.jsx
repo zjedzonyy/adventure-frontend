@@ -126,9 +126,9 @@ export default function UserSearchBar() {
                 >
                   {/* Avatar */}
                   <div className="flex-shrink-0">
-                    {user.avatar ? (
+                    {user.avatarUrl ? (
                       <img
-                        src={user.avatar}
+                        src={user.avatarUrl}
                         alt={user.username}
                         className="w-10 h-10 rounded-full object-cover"
                       />

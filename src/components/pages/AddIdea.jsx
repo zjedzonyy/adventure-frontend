@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext, use } from "react";
 import { useNavigate } from "react-router-dom";
+import MDEditor from "@uiw/react-md-editor";
 
 import { AuthContext } from "../auth/index.js";
 import { Navbar, Footer } from "../layout/index.js";
@@ -34,6 +35,7 @@ export default function AddIdea() {
     groups: [],
     priceRangeId: "",
     locationType: "",
+    detailedDescription: "",
   });
 
   const [availableOptions, setAvailableOptions] = useState({
@@ -97,11 +99,21 @@ export default function AddIdea() {
       newErrors.locationType = "Location type is required";
     }
 
+    // Detailed description validation
+    if (!formData.description.trim()) {
+      newErrors.detailedDescription = "Description is required";
+    } else if (formData.detailedDescription.length > 2500) {
+      newErrors.detailedDescription = "Description must be less than 2500 characters";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleInputChange = (field, value) => {
+    if (field === "detailedDescription" && value && value.length > 2500) {
+      return;
+    }
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -262,6 +274,36 @@ export default function AddIdea() {
               />
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 {formData.description.length}/1000 characters
+              </p>
+            </div>
+
+            {/* Detailed description */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Detailed description *
+              </label>
+              {errors.detailedDescription && (
+                <p className="text-sm text-red-600 dark:text-red-400 mb-1">
+                  {errors.detailedDescription}
+                </p>
+              )}
+              <div
+                className={`rounded-lg ${errors.detailedDescription ? "ring-2 ring-red-400" : ""}`}
+              >
+                <MDEditor
+                  value={formData.detailedDescription}
+                  onChange={(val) => handleInputChange("detailedDescription", val || "")}
+                  preview="edit"
+                  hideToolbar={false}
+                  visibleDragBar={false}
+                  height={200}
+                  data-color-mode={
+                    document.documentElement.classList.contains("dark") ? "dark" : "light"
+                  }
+                />
+              </div>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                {(formData.detailedDescription || "").length}/2500 characters
               </p>
             </div>
 

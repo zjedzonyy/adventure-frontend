@@ -1,6 +1,7 @@
 import { useContext, useState, useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { AuthContext } from "./index";
+import { Atom } from "react-loading-indicators";
 
 // This component checks if the user is authenticated.
 // If not, it redirects them to the login page.

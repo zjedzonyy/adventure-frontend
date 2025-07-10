@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { AuthContext } from "../auth/index.js";
 import { Navbar, Footer } from "../layout/index.js";
@@ -21,7 +21,7 @@ import {
   UserPlus,
   UserMinus,
   Lock,
-  Eye,
+  ExternalLink,
 } from "lucide-react";
 import { a } from "framer-motion/client";
 
@@ -36,7 +36,7 @@ export default function UsersProfile() {
   const [todoExpanded, setTodoExpanded] = useState(false);
   const [savedExpanded, setSavedExpanded] = useState(false);
   const [loading, setLoading] = useState(true);
-
+  const navigate = useNavigate();
   useEffect(() => {
     // Get sent requests
     const fetchSentFollowRequests = async () => {
@@ -50,7 +50,6 @@ export default function UsersProfile() {
         const data = await res.json();
         if (data.success) {
           setSentFollowRequest(data.data.some((req) => req.toUserId === userId));
-          console.log("Sent follow requests:", data.data);
         } else {
           console.error("Failed to fetch sent follow requests:", data.message);
         }
@@ -192,7 +191,8 @@ export default function UsersProfile() {
   return (
     <div className="bg-gray-50 dark:bg-dark_background text-text_primary dark:text-text_secondary transition-colors duration-300">
       <Navbar />
-      <div className="min-h-screen max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+      <div className="min-h-screen max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - Profile Info */}
           <div className="lg:col-span-1 space-y-6">
@@ -251,21 +251,17 @@ export default function UsersProfile() {
                 </div>
 
                 {/* Profile Views (if available) */}
-                {userData?.profileViewCount !== undefined && (
+                {/* {userData?.profileViewCount !== undefined && (
                   <div className="flex items-center justify-center space-x-1 text-sm text-gray-500 dark:text-gray-400 mt-2">
                     <Eye className="w-4 h-4" />
                     <span>{userData.profileViewCount} profile views</span>
                   </div>
-                )}
+                )} */}
               </div>
             </div>
 
             {/* Statistics */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                <Trophy className="w-5 h-5 mr-2 text-yellow-500" />
-                Statistics
-              </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-green-600">Followers</div>
@@ -364,10 +360,19 @@ export default function UsersProfile() {
                               </div>
                             </div>
                             {isOwnProfile && (
-                              <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                              <button
+                                onClick={() => navigate(`/edit-idea/${idea.id}`)}
+                                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                              >
                                 <Edit3 className="w-4 h-4" />
                               </button>
                             )}
+                            <button
+                              onClick={() => navigate(`/idea/${idea.id}`)}
+                              className="text-gray-400 ml-4 hover:text-gray-600 dark:hover:text-gray-300"
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                            </button>
                           </div>
                         </div>
                       ))
@@ -425,7 +430,14 @@ export default function UsersProfile() {
                                 >
                                   {idea.isActive ? "Active" : "Inactive"}
                                 </span>
+                                <button
+                                  onClick={() => navigate(`/idea/${idea.id}`)}
+                                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                >
+                                  <ExternalLink className="w-4 h-4" />
+                                </button>
                               </div>
+
                               <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">
                                 {idea.description}
                               </p>
@@ -443,8 +455,11 @@ export default function UsersProfile() {
                                 </span>
                               </div>
                             </div>
-                            <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                              <Edit3 className="w-4 h-4" />
+                            <button
+                              onClick={() => navigate(`/idea/${idea.id}`)}
+                              className="text-gray-400 ml-4 hover:text-gray-600 dark:hover:text-gray-300"
+                            >
+                              <ExternalLink className="w-4 h-4" />
                             </button>
                           </div>
                         </div>
@@ -464,7 +479,7 @@ export default function UsersProfile() {
                     className="text-xl font-semibold text-gray-900 dark:text-white flex items-center cursor-pointer select-none"
                   >
                     <Heart className="w-5 h-5 mr-2 text-red-500 fill-current" />
-                    Saved Ideas
+                    Favorites Ideas
                     <ChevronDown
                       className={`ml-2 w-4 h-4 transition-transform ${savedExpanded ? "rotate-180" : ""}`}
                     />
@@ -515,8 +530,11 @@ export default function UsersProfile() {
                                 </span>
                               </div>
                             </div>
-                            <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                              <Edit3 className="w-4 h-4" />
+                            <button
+                              onClick={() => navigate(`/idea/${idea.id}`)}
+                              className="text-gray-400 ml-4 hover:text-gray-600 dark:hover:text-gray-300"
+                            >
+                              <ExternalLink className="w-4 h-4" />
                             </button>
                           </div>
                         </div>

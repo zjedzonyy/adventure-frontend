@@ -49,8 +49,6 @@ export default function LogIn() {
   const handleSubmit = async (e) => {
     if (validate()) {
       // If all validations pass, proceed with form submission
-      console.log("Form submitted successfully", registerData);
-      console.log("Error State:", error);
       e.preventDefault();
       try {
         const res = await fetch(`${apiUrl}/auth/login`, {
@@ -70,7 +68,6 @@ export default function LogIn() {
         }
       } catch (error) {
         console.error(error);
-        console.log("Error during registration");
       }
     } else {
       setError("Please fill in all fields correctly:");
@@ -87,19 +84,16 @@ export default function LogIn() {
         credentials: "include",
       });
       const data = await res.json();
-      console.log("takie dane odbieram", data);
       if (data.name) {
         setError(data.message);
       } else {
         // Handle successful demo login
         loginUser(data.data);
         const from = location.state?.from || "/";
-        console.log("To jest from: ", from);
         navigate(from, { replace: true }); // Redirect to destination or homepage after demo login
       }
     } catch (error) {
       console.error(error);
-      console.log("Error during demo login");
     }
   };
 

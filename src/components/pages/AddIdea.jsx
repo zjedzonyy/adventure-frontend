@@ -71,8 +71,8 @@ export default function AddIdea() {
     // Description validation
     if (!formData.description.trim()) {
       newErrors.description = "Description is required";
-    } else if (formData.description.length > 1000) {
-      newErrors.description = "Description must be less than 1000 characters";
+    } else if (formData.description.length > 500) {
+      newErrors.description = "Description must be less than 500 characters";
     }
 
     // Categories validation
@@ -139,7 +139,6 @@ export default function AddIdea() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting form with data:", formData);
     if (!validateForm()) {
       console.log("Form validation failed", errors);
       return;
@@ -270,10 +269,10 @@ export default function AddIdea() {
                   errors.description ? "border-red-400" : "border-gray-300"
                 }`}
                 placeholder="Describe your idea in detail..."
-                maxLength={1000}
+                maxLength={500}
               />
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                {formData.description.length}/1000 characters
+                {formData.description.length}/500 characters
               </p>
             </div>
 

@@ -1,8 +1,7 @@
 import { useContext, useState } from "react";
-import { AuthContext } from "../auth/index.js";
-import { SortComponent } from "../common/index.js";
-import { apiUrl } from "../../utils/index.js";
-
+import { AuthContext } from "../auth";
+import { SortComponent } from "../common";
+import { apiUrl } from "../../utils";
 import {
   User,
   Calendar,
@@ -15,8 +14,9 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+
 export default function Comments({
-  comments,
+  comments = [],
   currentPage,
   totalPages,
   setCurrentPage,
@@ -33,10 +33,7 @@ export default function Comments({
   const { user, avatarUrl } = useContext(AuthContext);
   const [editedCommentId, setEditedCommentId] = useState(null);
   const [editedContent, setEditedContent] = useState("");
-  const startEditing = (comment) => {
-    setEditedCommentId(comment.id);
-    setEditedContent(comment.description);
-  };
+
   const sortOptions = {
     newest: { label: "Newest" },
     oldest: { label: "Oldest" },
@@ -49,17 +46,13 @@ export default function Comments({
   };
 
   const handleDeleteComment = async (commentId) => {
-    // Implement delete comment logic here
-    console.log("Delete comment with ID:", commentId);
     try {
       const res = await fetch(`${apiUrl}/comments/${commentId}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
       });
-      if (!res.ok) {
-        throw new Error("Failed to delete comment");
-      }
+      if (!res.ok) throw new Error("Failed to delete comment");
       setClicked((prev) => !prev);
     } catch (error) {
       console.error("Error deleting comment:", error);
@@ -74,18 +67,55 @@ export default function Comments({
         credentials: "include",
         body: JSON.stringify({ description: editedContent }),
       });
-      if (!res.ok) {
-        throw new Error("Failed to edit comment");
-      }
+      if (!res.ok) throw new Error("Failed to edit comment");
       setClicked((prev) => !prev);
       setEditedCommentId(null);
       setEditedContent("");
     } catch (error) {
-      console.error("Error deleting comment:", error);
+      console.error("Error editing comment:", error);
     }
   };
 
-  if (!comments || comments.length === 0) {
+  const renderAvatar = (imgUrl, username) =>
+    imgUrl ? (
+      <img src={imgUrl} alt={username} className="w-10 h-10 rounded-full object-cover" />
+    ) : (
+      <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
+        <User className="w-8 h-8 text-white" />
+      </div>
+    );
+
+  const renderAddComment = () =>
+    user && (
+      <div className="mb-12">
+        <div className="flex space-x-4">
+          <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+            {renderAvatar(avatarUrl, user.username)}
+          </div>
+          <div className="flex-1 text-text_secondary dark:text-text_primary">
+            <textarea
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Share your thoughts about this idea..."
+              className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none"
+              rows="4"
+            />
+            <div className="flex justify-end mt-3">
+              <button
+                onClick={handleAddComment}
+                disabled={!newComment.trim()}
+                className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+              >
+                <Send className="w-4 h-4" />
+                <span>Post Comment</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+
+  if (comments.length === 0) {
     return (
       <div className="bg-white dark:bg-gray-800 border-t dark:border-gray-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -96,70 +126,28 @@ export default function Comments({
           <p className="text-gray-600 dark:text-gray-300 text-center">
             No comments yet. Be the first to share your thoughts!
           </p>
+          {renderAddComment()}
         </div>
       </div>
     );
   }
-  // If comments exist, render the comments section
+
   return (
-    // Comments Section - Full Width, Centered
     <div className="bg-white dark:bg-gray-800 border-t dark:border-gray-700">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8 flex items-center justify-center">
           <MessageCircle className="w-6 h-6 mr-3" />
           Comments ({commentsCount})
         </h2>
-
-        {/* Add Comment */}
-        {user && (
-          <div className="mb-12">
-            <div className="flex space-x-4">
-              <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                {/* Avatar */}
-                {avatarUrl ? (
-                  <img
-                    src={avatarUrl}
-                    alt={user.username}
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                    <User className="w-8 h-8 text-white" />
-                  </div>
-                )}
-              </div>
-              <div className="flex-1 text-text_secondary dark:text-text_primary">
-                <textarea
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="Share your thoughts about this idea..."
-                  className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none"
-                  rows="4"
-                />
-                <div className="flex justify-end mt-3">
-                  <button
-                    onClick={handleAddComment}
-                    disabled={!newComment.trim()}
-                    className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
-                  >
-                    <Send className="w-4 h-4" />
-                    <span>Post Comment</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Comments List */}
+        {renderAddComment()}
         <div className="space-y-6 mb-8">
-          <SortComponent
+          {/* <SortComponent
             sortOptions={sortOptions}
             currentSort={commentSort}
             onSortChange={setCommentSort}
             className="max-w-xs"
             setCommentSortChange={setCommentSortChange}
-          ></SortComponent>
+          /> */}
           {comments.map((comment) => (
             <div
               key={comment.id}
@@ -167,23 +155,10 @@ export default function Comments({
             >
               <div className="flex-shrink-0">
                 <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
-                  {/* Avatar */}
-                  {comment.author.avatarUrl ? (
-                    <img
-                      src={comment.author.avatarUrl}
-                      alt={comment.author.username}
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                      <User className="w-8 h-8 text-white" />
-                    </div>
-                  )}
+                  {renderAvatar(comment.author.avatarUrl, comment.author.username)}
                 </div>
               </div>
-
               <div className="flex-1">
-                {/* Comment description */}
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="font-semibold flex text-gray-900 dark:text-white">
                     {comment.author.username}
@@ -194,11 +169,9 @@ export default function Comments({
                     {new Date(comment.createdAt).toLocaleDateString("pl-PL")}
                   </span>
                 </div>
-
                 <p className="text-gray-600 dark:text-gray-300 mb-3 leading-relaxed">
                   {comment.description}
                 </p>
-
                 <div className="flex items-center space-x-5 text-sm mb-3 py-2">
                   <button
                     onClick={() => handleLikeComment(comment.id)}
@@ -210,7 +183,10 @@ export default function Comments({
                   {user && user.username === comment.author.username && (
                     <div className="flex items-center space-x-3">
                       <button
-                        onClick={() => startEditing(comment)}
+                        onClick={() => {
+                          setEditedCommentId(comment.id);
+                          setEditedContent(comment.description);
+                        }}
                         className="text-gray-500 hover:text-yellow-500 transition-colors"
                       >
                         <Edit3 className="w-4 h-4" />
@@ -230,8 +206,6 @@ export default function Comments({
                     <Flag className="w-4 h-4" />
                   </button>
                 </div>
-
-                {/* EDIT INPUT */}
                 {editedCommentId === comment.id && (
                   <div className="w-full">
                     <textarea
@@ -261,8 +235,6 @@ export default function Comments({
             </div>
           ))}
         </div>
-
-        {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex items-center justify-center space-x-4">
             <button
@@ -273,7 +245,6 @@ export default function Comments({
               <ChevronLeft className="w-4 h-4" />
               <span>Previous</span>
             </button>
-
             <div className="flex items-center space-x-2">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                 <button
@@ -289,7 +260,6 @@ export default function Comments({
                 </button>
               ))}
             </div>
-
             <button
               onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}

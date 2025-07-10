@@ -15,6 +15,7 @@ const RouterErrorBoundary = () => {
     if (error?.status === 404) return "404";
     if (error?.status === 400) return "400";
     if (error?.status === 500) return "500";
+    if (error?.status === 403) return "403";
     if (error?.name === "NetworkError") return "network";
     return "generic";
   };
@@ -28,6 +29,11 @@ const RouterErrorBoundary = () => {
         return {
           title: "Page Not Found",
           message: error?.statusText || "The page you're looking for doesn't exist.",
+        };
+      case "403":
+        return {
+          title: "Access Denied",
+          message: error?.statusText || "You don’t have permission to view this page.",
         };
       case "400":
         return {

@@ -1,5 +1,4 @@
 export { default as Homepage } from "./Homepage";
-export { default as ErrorPage } from "./ErrorPage";
 export { default as Protected } from "./Protected";
 export { default as AddIdea } from "./AddIdea";
 export { default as EditIdea } from "./EditIdea";
@@ -9,5 +8,4 @@ export { default as SignUp } from "./SignUp";
 export { default as LogIn } from "./LogIn";
 export { default as UsersProfile } from "./UsersProfile";
 export { default as Settings } from "./Settings";
-export { default as RouterErrorBoundary } from "./RouterErrorBoundary";
 export { default as EditAccount } from "./EditAccount";

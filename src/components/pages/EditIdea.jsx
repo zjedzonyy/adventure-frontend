@@ -4,6 +4,7 @@ import MDEditor from "@uiw/react-md-editor";
 import { AuthContext } from "../auth/index.js";
 import { Navbar, Footer } from "../layout/index.js";
 import { apiUrl } from "../../utils/index.js";
+import { Atom } from "react-loading-indicators";
 
 import {
   FileText,
@@ -18,9 +19,12 @@ import {
   Check,
   Edit,
 } from "lucide-react";
+import { div, h1 } from "framer-motion/client";
 export default function AddIdea() {
   const { ideaId } = useParams();
   const { user, darkMode, labels } = useContext(AuthContext);
+  const [authorUsername, setAuthorUsername] = useState();
+
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -46,9 +50,11 @@ export default function AddIdea() {
   });
 
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
+  const delay = (ms) => new Promise((res) => setTimeout(res, ms));
   // Initialize available options from labels and Idea data
   useEffect(() => {
     if (labels) {
@@ -68,9 +74,8 @@ export default function AddIdea() {
         if (!response.ok) {
           throw new Error("Failed to fetch idea data");
         }
-
         const data = await response.json();
-        console.log("Fetched idea data:", data);
+
         if (data.success) {
           setFormData({
             title: data.data?.title || "",
@@ -89,14 +94,18 @@ export default function AddIdea() {
             priceRangeId: data.data?.priceRange?.id || "",
             locationType: data.data?.locationType || "FLEXIBLE",
           });
+          setAuthorUsername(data.data?.author.username);
         } else {
           setErrors({ general: data.message || "Failed to load idea" });
         }
       } catch (error) {
         console.error("Error fetching idea:", error);
         setErrors({ general: "An error occurred while fetching the idea" });
+      } finally {
+        setLoading(false);
       }
     };
+
     fetchIdeaData();
   }, [labels]);
 
@@ -180,7 +189,6 @@ export default function AddIdea() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting form with data:", formData);
     if (!validateForm()) {
       console.log("Form validation failed", errors);
       return;
@@ -228,6 +236,18 @@ export default function AddIdea() {
       setIsSubmitting(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Atom color="#c031cc" size="large" text="" textColor="" />
+      </div>
+    );
+  }
+
+  if (user.username !== authorUsername && loading === false) {
+    throw new Response("You can't access this page", { status: 403 });
+  }
 
   if (submitSuccess) {
     return (

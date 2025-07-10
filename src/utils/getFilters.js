@@ -1,7 +1,6 @@
 import { apiUrl } from "./api";
 
 export async function getFilters() {
-  console.log("Fetching filters from backend...");
   // ENUMS (can't fetch them from backend, so hardcoded)
   const locationTypes = [
     { value: "INDOOR", label: "Indoor" },
@@ -29,7 +28,6 @@ export async function getFilters() {
       credentials: "include",
     });
     const data = await res.json();
-    console.log("Filters data:", data);
     if (res.ok) {
       categories.push(...data.data.categories);
       durations.push(...data.data.durations);

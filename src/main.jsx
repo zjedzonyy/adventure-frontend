@@ -5,28 +5,27 @@ import App from "./components/App.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import {
   Homepage,
-  ErrorPage,
-  Protected,
   AddIdea,
   EditIdea,
   Idea,
+  Protected,
   SearchIdeas,
   LogIn,
   SignUp,
   UsersProfile,
   Settings,
-  RouterErrorBoundary,
   EditAccount,
 } from "./components/pages";
 import { RequireAuth, ProtectedRoutes } from "./components/auth/index.js";
-
+import { ErrorPage, RouterErrorBoundary } from "./components/errors/index.js";
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+    errorElement: <RouterErrorBoundary />,
     children: [
       { path: "/", element: <Homepage /> },
-      { path: "homepage", element: <Homepage />, errorElement: <RouterErrorBoundary /> },
+      { path: "homepage", element: <Homepage /> },
       { path: "signup", element: <SignUp /> },
       { path: "login", element: <LogIn /> },
       {
@@ -35,6 +34,7 @@ const router = createBrowserRouter([
             <ProtectedRoutes />
           </RequireAuth>
         ),
+        errorElement: <RouterErrorBoundary />,
         children: [
           { path: "profile/:userId", element: <UsersProfile /> },
           { path: "settings", element: <Settings /> },
@@ -42,8 +42,6 @@ const router = createBrowserRouter([
           { path: "ideas/search", element: <SearchIdeas /> },
           { path: "add-idea", element: <AddIdea /> },
           { path: "edit-idea/:ideaId", element: <EditIdea /> },
-          { path: "edit-account", element: <EditAccount /> },
-          { path: "*", element: <RouterErrorBoundary /> },
         ],
       },
     ],

@@ -82,10 +82,6 @@ export default function SignUp() {
   const handleSubmit = async (e) => {
     if (validateEmail() && validatePassword() && validateConfirmPassword()) {
       // If all validations pass, proceed with form submission
-      console.log("Form submitted successfully", registerData);
-      console.log("Confirm Password:", confirmPassword);
-      console.log("Show Password:", showPassword);
-      console.log("Error State:", error);
       e.preventDefault();
       try {
         const res = await fetch(`${apiUrl}/auth/register`, {
@@ -108,10 +104,8 @@ export default function SignUp() {
         if (!data.field && data.name) {
           setBackendData(data);
         }
-        console.log(data);
       } catch (error) {
         console.error(error);
-        console.log("Error during registration");
       }
     } else {
       setError({

@@ -23,6 +23,15 @@ const ErrorPage = ({
           primaryBtn:
             "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700",
         };
+      case "403":
+        return {
+          icon: <AlertTriangle className="w-16 h-16" />,
+          color: "yellow",
+          bgGradient: "from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20",
+          iconBg: "from-yellow-600 to-amber-600",
+          primaryBtn:
+            "bg-gradient-to-r from-yellow-600 to-amber-600 hover:from-yellow-700 hover:to-amber-700",
+        };
       case "400":
         return {
           icon: <AlertTriangle className="w-16 h-16" />,
@@ -191,84 +200,4 @@ const ErrorPage = ({
   );
 };
 
-// Example usage with different error types
-const ErrorPageExamples = () => {
-  const [currentError, setCurrentError] = React.useState("404");
-
-  return (
-    <div className="p-8 bg-gray-100 dark:bg-gray-900 min-h-screen">
-      {/* Error Type Selector */}
-      <div className="max-w-4xl mx-auto mb-8">
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-            Preview Different Error Types:
-          </h3>
-          <div className="flex flex-wrap gap-2">
-            {[
-              { type: "404", label: "404 - Not Found" },
-              { type: "400", label: "400 - Bad Request" },
-              { type: "500", label: "500 - Server Error" },
-              { type: "network", label: "Network Error" },
-              { type: "generic", label: "Generic Error" },
-            ].map(({ type, label }) => (
-              <button
-                key={type}
-                onClick={() => setCurrentError(type)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  currentError === type
-                    ? "bg-purple-600 text-white"
-                    : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Dynamic Error Display */}
-      {currentError === "404" && (
-        <ErrorPage
-          errorType="404"
-          title="Page Not Found"
-          message="The page you're looking for doesn't exist or has been moved."
-        />
-      )}
-
-      {currentError === "400" && (
-        <ErrorPage
-          errorType="400"
-          title="Bad Request"
-          message="There was an issue with your request. Please check your input and try again."
-        />
-      )}
-
-      {currentError === "500" && (
-        <ErrorPage
-          errorType="500"
-          title="Server Error"
-          message="Something went wrong on our end. Our team has been notified and is working on a fix."
-        />
-      )}
-
-      {currentError === "network" && (
-        <ErrorPage
-          errorType="network"
-          title="Connection Problem"
-          message="Unable to connect to our servers. Please check your internet connection."
-        />
-      )}
-
-      {currentError === "generic" && (
-        <ErrorPage
-          errorType="Oops!"
-          title="Something Went Wrong"
-          message="An unexpected error occurred. Please try again or contact support if the problem persists."
-        />
-      )}
-    </div>
-  );
-};
-
-export default ErrorPageExamples;
+export default ErrorPage;

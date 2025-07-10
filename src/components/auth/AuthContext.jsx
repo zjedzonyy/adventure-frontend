@@ -6,6 +6,7 @@ export default AuthContext;
 
 export function AuthProvider({ children }) {
   const [darkMode, setDarkMode] = useState(null);
+  const [avatarChanged, setAvatarChanged] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("theme");
@@ -49,7 +50,6 @@ export function AuthProvider({ children }) {
   };
   const [loading, setLoading] = useState(true);
 
-  console.log("To jest moj user: ", user);
   useEffect(() => {
     // Check if user is already logged in
     const savedUser = localStorage.getItem("user");
@@ -89,7 +89,7 @@ export function AuthProvider({ children }) {
       }
     };
     fetchUserProfile();
-  }, []);
+  }, [avatarChanged]);
 
   const getCachedAvatar = (userId) => {
     const cached = localStorage.getItem(`avatar_${userId}`);
@@ -185,6 +185,7 @@ export function AuthProvider({ children }) {
         labels,
         updateAvatar,
         avatarUrl,
+        setAvatarChanged,
       }}
     >
       {children}

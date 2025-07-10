@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../auth/index.js";
 import { Navbar, Footer } from "../layout/index.js";
+import { IdeaCard } from "../ideas/index.js";
 
 import { Compass, Users, Heart, Star, Plus, Dice1 } from "lucide-react";
 import { apiUrl } from "../../utils/api.js";
@@ -26,17 +27,25 @@ export default function Homepage() {
       });
 
       const data = await res.json();
-      console.log(data);
       navigate(`/idea/${data.data}`, { state: { from: location.pathname } });
     } catch (err) {
       console.error(err);
     }
   };
 
+  const navigateTo = (path) => {
+    if (!user) {
+      navigate("/login", { state: { from: path } });
+      return;
+    }
+
+    navigate(path);
+  };
+
   useEffect(() => {
     const getBestIdeas = async () => {
       try {
-        const res = await fetch(`${apiUrl}/ideas?limit=6&page=1&sort=popular`, {
+        const res = await fetch(`${apiUrl}/ideas/popular`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -44,8 +53,7 @@ export default function Homepage() {
 
         if (res.ok) {
           const data = await res.json();
-          setSampleIdeas(data.data.ideas);
-          console.log(data);
+          setSampleIdeas(data.data);
         }
       } catch (err) {
         console.error(err);
@@ -55,7 +63,6 @@ export default function Homepage() {
   }, []);
 
   const categories = [
-    "All",
     "Self-Discovery",
     "Art",
     "Cooking",
@@ -65,8 +72,9 @@ export default function Homepage() {
     "Technology",
     "Music",
     "Science",
+    "Mindfulness",
+    "Education",
   ];
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-dark_background text-text_primary dark:text-text_secondary transition-colors duration-300">
       {/* Header */}
@@ -74,7 +82,7 @@ export default function Homepage() {
       <Navbar></Navbar>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br dark:from-dark_secondary dark:to-dark_primary from-purple-600 via-blue-600 to-cyan-500 text-white py-24">
+      <section className="bg-gradient-to-br dark:from-dark_secondary dark:to-dark_primary from-purple-600 via-blue-600 to-cyan-500 text-white py-20">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-6xl font-bold mb-8 leading-tight">Find. Try. Repeat.</h2>
           <p className="text-xl mb-12 max-w-3xl mx-auto opacity-90 leading-relaxed">
@@ -104,7 +112,7 @@ export default function Homepage() {
               <h3 className="text-3xl font-bold text-gray-900 dark:text-text_primary mb-2">
                 Choose from hundreds of categories
               </h3>
-              <p className="text-gray-600 dark:text-text_secondary">
+              <p className="text-gray-600 dark:text-text_primary">
                 Find the perfect activity for your interests
               </p>
             </div>
@@ -130,61 +138,14 @@ export default function Homepage() {
             <h3 className="text-4xl font-bold text-gray-900 dark:text-text_primary mb-4">
               Popular Ideas
             </h3>
-            <p className="text-lg text-gray-600 dark:text-text_secondary">
+            <p className="text-lg text-gray-600 dark:text-text_primary">
               Discover what others are loving right now
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {sampleIdeas?.map((idea) => (
-              <div
-                key={idea.id}
-                className="bg-white dark:bg-dark_background_secondary rounded-xl shadow-lg hover:shadow-blue-500 transition-all duration-300 overflow-hidden group cursor-pointer flex flex-col"
-              >
-                <div className="p-6 h-full flex flex-col">
-                  <div className="flex items-start justify-between mb-4">
-                    <span className="bg-purple-100 dark:bg-dark_primary dark:text-text_primary text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                      {idea.category}
-                    </span>
-                    <div className="flex items-center space-x-1">
-                      <Heart className="w-4 h-4 text-red-400 fill-current" />
-                      <span className="text-sm text-gray-600 dark:text-text_secondary">
-                        {idea.likes}
-                      </span>
-                    </div>
-                  </div>
-
-                  <h4 className="text-lg font-bold text-gray-900 mb-2 dark:text-text_secondary dark:hover:text-text_primary group-hover:text-purple-600 dark:group-hover:text-text_primary transition-colors">
-                    {idea.title}
-                  </h4>
-
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-3 dark:text-text_secondary">
-                    {idea.description}
-                  </p>
-                  <div className="flex items-center justify-between text-xs text-gray-500 mt-auto mb-4 dark:text-text_secondary ">
-                    <span>Level: {idea.difficulty}</span>
-                    <span>Time: {idea.time}</span>
-                  </div>
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-950">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
-                        <span className="text-white text-xs font-bold dark:text-text_secondary">
-                          {idea.author}
-                        </span>
-                      </div>
-                      <span className="text-sm text-gray-700 dark:text-text_secondary">
-                        {idea.author}
-                      </span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <button className="text-gray-400 hover:text-red-500 transition-colors">
-                        <Star className="w-5 h-5 text-yellow-400 fill-current" />
-                      </button>
-                      <span className="text-sm text-gray-600 dark:text-text_secondary">4.76</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <IdeaCard idea={idea}></IdeaCard>
             ))}
           </div>
         </div>
@@ -206,7 +167,10 @@ export default function Homepage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mt-16">
             <div className="text-center">
-              <div className="bg-white w-20 h-20 dark:bg-dark_background rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <div
+                onClick={() => navigateTo("/ideas/search")}
+                className="bg-white w-20 h-20 cursor-pointer ease-in duration-200 hover:scale-[1.15] dark:bg-dark_background rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg"
+              >
                 <Compass className="w-10 h-10 text-purple-600" />
               </div>
               <h4 className="text-2xl font-semibold text-gray-900 mb-4 dark:text-text_secondary">
@@ -218,7 +182,10 @@ export default function Homepage() {
             </div>
 
             <div className="text-center">
-              <div className="bg-white w-20 h-20 dark:bg-dark_background dark:fill-current rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <div
+                onClick={() => navigateTo("/add-idea")}
+                className="bg-white w-20 h-20 cursor-pointer ease-in duration-200 hover:scale-[1.15] dark:bg-dark_background rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg"
+              >
                 <Plus className="w-10 h-10 text-purple-600 " />
               </div>
               <h4 className="text-2xl font-semibold text-gray-900 mb-4 dark:text-text_secondary">
@@ -230,7 +197,10 @@ export default function Homepage() {
             </div>
 
             <div className="text-center">
-              <div className="bg-white w-20 h-20 dark:bg-dark_background rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <div
+                onClick={() => navigateTo("/settings")}
+                className="bg-white w-20 h-20 cursor-pointer ease-in duration-200 hover:scale-[1.15] dark:bg-dark_background rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg"
+              >
                 <Users className="w-10 h-10 text-purple-600" />
               </div>
               <h4 className="text-2xl font-semibold text-gray-900 mb-4 dark:text-text_secondary">

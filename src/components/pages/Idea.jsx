@@ -62,7 +62,6 @@ export default function Idea() {
           setIdeaData(data.data);
           setUserStatus(data.data.userStatus);
         }
-        console.log("Idea data fetched successfully:", data.data);
       } catch (error) {
         console.error("Failed to fetch idea data:", error);
       } finally {
@@ -103,7 +102,6 @@ export default function Idea() {
           credentials: "include",
         });
         const data = await res.json();
-        console.log(data);
         if (data.success) {
           setUserRating(data.data.rating);
           setHoverRating(data.data.rating);
@@ -171,7 +169,6 @@ export default function Idea() {
         body: JSON.stringify({ rating }),
       });
       const data = await res.json();
-      console.log("Rating response:", data);
       if (data.success) {
         setUserRating(rating);
       }

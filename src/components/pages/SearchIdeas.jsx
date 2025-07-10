@@ -72,8 +72,6 @@ export default function SearchIdeas() {
       query += `status=${filters.status}&`;
     }
 
-    console.log("Current filters:", filters);
-    console.log("Current query:", query);
     const fetchIdeas = async () => {
       try {
         const res = await fetch(`${apiUrl}/ideas?${query}/${resultsFilters}`, {
@@ -89,7 +87,6 @@ export default function SearchIdeas() {
           setTotalPages(data.data.pagination ? data.data.pagination.totalPages : 1);
           setTotalCount(data.data.pagination ? data.data.pagination.totalItems : 0);
         }
-        console.log(totalCount);
       } catch (error) {
         console.error("Error fetching ideas:", error);
       }
@@ -396,49 +393,51 @@ export default function SearchIdeas() {
                   </div>
                 )}
               </div>
+              <div>
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        className="flex items-center justify-center p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        <ChevronLeft className="w-5 h-5" />
+                      </button>
+
+                      <div className="flex items-center gap-1">
+                        {getDisplayedPages(currentPage, totalPages).map((page, i) => (
+                          <button
+                            key={i}
+                            onClick={() => typeof page === "number" && setCurrentPage(page)}
+                            disabled={page === "..."}
+                            className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors text-sm font-medium ${
+                              page === currentPage
+                                ? "bg-purple-600 text-white shadow-sm"
+                                : page === "..."
+                                  ? "cursor-default text-gray-400"
+                                  : "bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        ))}
+                      </div>
+
+                      <button
+                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                        className="flex items-center justify-center p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        <ChevronRight className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center space-x-4 mt-auto pt-6">
-              <button
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                className="flex items-center space-x-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                <span>Previous</span>
-              </button>
-
-              <div className="flex items-center space-x-2">
-                {getDisplayedPages(currentPage, totalPages).map((page, i) => (
-                  <button
-                    key={i}
-                    onClick={() => typeof page === "number" && setCurrentPage(page)}
-                    disabled={page === "..."}
-                    className={`px-3 py-2 rounded-lg transition-colors ${
-                      page === currentPage
-                        ? "bg-purple-600 text-white shadow-sm"
-                        : page === "..."
-                          ? "cursor-default text-gray-400"
-                          : "bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
-                    }`}
-                  >
-                    {page}
-                  </button>
-                ))}
-              </div>
-
-              <button
-                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-                className="flex items-center space-x-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <span>Next</span>
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          )}
         </div>
       </div>
       <Footer />

@@ -6,7 +6,7 @@ export default function Footer() {
           {/* Social Media Icons */}
           <div className="flex items-center space-x-6">
             <a
-              href="https://linkedin.com/in/twoj-profil"
+              href="https://linkedin.com/in/artompor"
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-400 hover:text-white transition-colors duration-200"
@@ -18,7 +18,7 @@ export default function Footer() {
             </a>
 
             <a
-              href="https://github.com/twoj-github"
+              href="https://github.com/zjedzonyy"
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-400 hover:text-white transition-colors duration-200"
@@ -30,7 +30,7 @@ export default function Footer() {
             </a>
 
             <a
-              href="mailto:twoj-email@example.com"
+              href="mailto:artompor@gmail.com"
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-400 hover:text-white transition-colors duration-200"
@@ -49,7 +49,11 @@ export default function Footer() {
 
           {/* Copyright */}
           <div className="text-gray-400 text-sm text-center">
-            © {new Date().getFullYear()} AdVenture by zjedzonyy. All rights reserved.
+            © {new Date().getFullYear()} AdVenture by artutom. All rights reserved.
+          </div>
+          <div className="text-gray-400 text-sm text-center">
+            This project is my own take on the final assignment from The Odin Project. Big thanks to
+            the TOP community for the guidance and inspiration!
           </div>
         </div>
       </div>

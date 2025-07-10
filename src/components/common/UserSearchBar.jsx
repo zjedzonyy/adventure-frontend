@@ -50,7 +50,6 @@ export default function UserSearchBar() {
 
         if (response.ok) {
           const data = await response.json();
-          console.log("Search results:", data);
           setSearchResults(data.data || []);
           setIsDropdownOpen(true);
         } else {

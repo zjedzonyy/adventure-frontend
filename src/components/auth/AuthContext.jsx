@@ -6,19 +6,8 @@ export default AuthContext;
 
 export function AuthProvider({ children }) {
   const [darkMode, setDarkMode] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [avatarChanged, setAvatarChanged] = useState(false);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("theme");
-    setDarkMode(saved === "light" ? false : true);
-  }, []);
-
-  useEffect(() => {
-    if (darkMode !== null) {
-      localStorage.setItem("theme", darkMode ? "dark" : "light");
-    }
-  }, [darkMode]);
-
   const toggleDarkMode = () => {
     setDarkMode((prev) => !prev);
   };
@@ -35,6 +24,17 @@ export function AuthProvider({ children }) {
 
   const [avatarUrl, setAvatarUrl] = useState(null);
 
+  useEffect(() => {
+    const saved = localStorage.getItem("theme");
+    setDarkMode(saved === "light" ? false : true);
+  }, []);
+
+  useEffect(() => {
+    if (darkMode !== null) {
+      localStorage.setItem("theme", darkMode ? "dark" : "light");
+    }
+  }, [darkMode]);
+
   const loginUser = async (userData) => {
     setUser(userData.user);
 
@@ -48,7 +48,6 @@ export function AuthProvider({ children }) {
       }
     }
   };
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -66,26 +65,24 @@ export function AuthProvider({ children }) {
         const data = await res.json();
         if (data.success) {
           setUser(data.data);
+          setLoading(false);
+          if (data.data.avatarUrl) {
+            const cachedAvatar = getCachedAvatar(data.data.id);
+            if (cachedAvatar) {
+              setAvatarUrl(cachedAvatar);
+            } else {
+              // download and cache
+              const avatarBlob = await fetchAndCacheAvatar(data.data.avatarUrl, data.data.id);
+              setAvatarUrl(avatarBlob);
+            }
+          }
         } else {
           setUser(null);
-        }
-
-        // check cache if user has avatarUrl
-        if (data.data.avatarUrl) {
-          const cachedAvatar = getCachedAvatar(data.data.id);
-          if (cachedAvatar) {
-            setAvatarUrl(cachedAvatar);
-          } else {
-            // download and cache
-            const avatarBlob = await fetchAndCacheAvatar(data.data.avatarUrl, data.data.id);
-            setAvatarUrl(avatarBlob);
-          }
+          setLoading(false);
         }
       } catch (error) {
         console.error("Failed to fetch user profile:", error);
         setUser(null);
-      } finally {
-        setLoading(false);
       }
     };
     fetchUserProfile();

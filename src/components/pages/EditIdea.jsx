@@ -19,7 +19,7 @@ import {
   Check,
   Edit,
 } from "lucide-react";
-import { div, h1 } from "framer-motion/client";
+
 export default function AddIdea() {
   const { ideaId } = useParams();
   const { user, darkMode, labels } = useContext(AuthContext);

@@ -8,8 +8,21 @@ import { AuthContext } from "./index";
 export default function RequireAuth({ children }) {
   const { user, loading } = useContext(AuthContext);
   const location = useLocation();
+  const [showSpinner, setShowSpinner] = useState(false);
 
-  if (loading) return <div>Loading...</div>;
+  useEffect(() => {
+    const timeout = setTimeout(() => setShowSpinner(true), 300); // show spinner ONLY after 300ms
+
+    return () => clearTimeout(timeout);
+  }, []);
+
+  if (loading) {
+    return showSpinner ? (
+      <div className="min-h-screen flex items-center justify-center">
+        <Atom color="#c031cc" size="large" text="" textColor="" />
+      </div>
+    ) : null;
+  }
 
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />;

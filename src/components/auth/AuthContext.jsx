@@ -1,18 +1,23 @@
 import { apiUrl, getFilters } from "../../utils/index.js";
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useCallback, useRef } from "react";
 
 const AuthContext = createContext();
 export default AuthContext;
 
 export function AuthProvider({ children }) {
+  // Theme state
   const [darkMode, setDarkMode] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [avatarChanged, setAvatarChanged] = useState(false);
-  const toggleDarkMode = () => {
-    setDarkMode((prev) => !prev);
-  };
 
+  // Auth state
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState(null);
+
+  // Avatar state
+  const [avatarUrl, setAvatarUrl] = useState(null);
+  const [avatarLoading, setAvatarLoading] = useState(false);
+
+  // Labels state
   const [labels, setLabels] = useState({
     categories: [],
     durations: [],
@@ -21,74 +26,47 @@ export function AuthProvider({ children }) {
     locationTypes: [],
     statusTypes: [],
   });
+  const [labelsLoading, setLabelsLoading] = useState(false);
 
-  const [avatarUrl, setAvatarUrl] = useState(null);
+  // Refs to prevent multiple requests
+  const authFetchRef = useRef(false);
+  const labelsFetchRef = useRef(false);
 
+  // DEBUG: Console log every state change
+  // useEffect(() => {
+  //   console.log("AUTH STATE CHANGE:", {
+  //     user: user ? { id: user.id, email: user.email } : null,
+  //     loading,
+  //     avatarUrl: avatarUrl ? "present" : "null",
+  //     timestamp: new Date().toISOString(),
+  //   });
+  // }, [user, loading, avatarUrl]);
+
+  // Theme management
+  const toggleDarkMode = useCallback(() => {
+    setDarkMode((prev) => {
+      const newMode = !prev;
+      localStorage.setItem("theme", newMode ? "dark" : "light");
+      return newMode;
+    });
+  }, []);
+
+  // Initialize theme
   useEffect(() => {
     const saved = localStorage.getItem("theme");
     setDarkMode(saved === "light" ? false : true);
   }, []);
 
+  // Update document class when theme changes
   useEffect(() => {
     if (darkMode !== null) {
-      localStorage.setItem("theme", darkMode ? "dark" : "light");
+      document.documentElement.classList.remove("dark", "light");
+      document.documentElement.classList.add(darkMode ? "dark" : "light");
     }
   }, [darkMode]);
 
-  const loginUser = async (userData) => {
-    setUser(userData.user);
-
-    if (userData.avatarUrl) {
-      const cachedAvatar = getCachedAvatar(userData.id);
-      if (cachedAvatar) {
-        setAvatarUrl(cachedAvatar);
-      } else {
-        const avatarBlob = await fetchAndCacheAvatar(userData.avatarUrl, userData.id);
-        setAvatarUrl(avatarBlob);
-      }
-    }
-  };
-
-  useEffect(() => {
-    // Check if user is already logged in
-    const savedUser = localStorage.getItem("user");
-    if (savedUser) {
-      return;
-    }
-    // Fetch user profile on component mount
-    const fetchUserProfile = async () => {
-      try {
-        const res = await fetch(`${apiUrl}/users/me`, {
-          method: "GET",
-          credentials: "include",
-        });
-        const data = await res.json();
-        if (data.success) {
-          setUser(data.data);
-          setLoading(false);
-          if (data.data.avatarUrl) {
-            const cachedAvatar = getCachedAvatar(data.data.id);
-            if (cachedAvatar) {
-              setAvatarUrl(cachedAvatar);
-            } else {
-              // download and cache
-              const avatarBlob = await fetchAndCacheAvatar(data.data.avatarUrl, data.data.id);
-              setAvatarUrl(avatarBlob);
-            }
-          }
-        } else {
-          setUser(null);
-          setLoading(false);
-        }
-      } catch (error) {
-        console.error("Failed to fetch user profile:", error);
-        setUser(null);
-      }
-    };
-    fetchUserProfile();
-  }, [avatarChanged]);
-
-  const getCachedAvatar = (userId) => {
+  // Avatar management
+  const getCachedAvatar = useCallback((userId) => {
     const cached = localStorage.getItem(`avatar_${userId}`);
     const timestamp = localStorage.getItem(`avatar_${userId}_timestamp`);
 
@@ -98,31 +76,33 @@ export function AuthProvider({ children }) {
       if (cacheAge < maxAge) {
         return cached;
       } else {
-        // delete old cache
         localStorage.removeItem(`avatar_${userId}`);
         localStorage.removeItem(`avatar_${userId}_timestamp`);
       }
     }
     return null;
-  };
+  }, []);
 
-  const fetchAndCacheAvatar = async (avatarUrl, userId) => {
+  const fetchAndCacheAvatar = useCallback(async (avatarUrl, userId) => {
     try {
+      setAvatarLoading(true);
       const response = await fetch(avatarUrl);
-      // Check response
+
       if (!response.ok) {
         console.error("Avatar fetch failed:", response.status, response.statusText);
         return null;
       }
+
       const contentType = response.headers.get("content-type");
       if (!contentType || !contentType.startsWith("image/")) {
         console.error("Response is not an image:", contentType);
         return null;
       }
+
       const blob = await response.blob();
       const objectUrl = URL.createObjectURL(blob);
 
-      // Cache in local storage (base64)
+      // Cache in localStorage
       const reader = new FileReader();
       reader.onloadend = () => {
         localStorage.setItem(`avatar_${userId}`, reader.result);
@@ -134,58 +114,216 @@ export function AuthProvider({ children }) {
     } catch (error) {
       console.error("Avatar fetch error:", error);
       return null;
+    } finally {
+      setAvatarLoading(false);
     }
-  };
-
-  const updateAvatar = async (newAvatarUrl) => {
-    // delete old cache
-    localStorage.removeItem(`avatar_${user.id}`);
-    localStorage.removeItem(`avatar_${user.id}_timestamp`);
-
-    // download new avatar
-    const avatarBlob = await fetchAndCacheAvatar(newAvatarUrl, user.id);
-    setAvatarUrl(avatarBlob);
-  };
-
-  useEffect(() => {
-    // Fetch labels for ideas when user is logged in
-    const fetchLabels = async () => {
-      try {
-        const filters = await getFilters();
-        setLabels(filters);
-      } catch (error) {
-        console.error("Failed to fetch labels:", error);
-      }
-    };
-    fetchLabels();
   }, []);
 
-  // Change the document's class based on darkMode state
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.remove("dark");
-      document.documentElement.classList.add("light");
-    } else {
-      document.documentElement.classList.remove("light");
-      document.documentElement.classList.add("dark");
-    }
-  }, [darkMode]);
+  const loadAvatar = useCallback(
+    async (userData) => {
+      if (!userData?.avatarUrl) {
+        return;
+      }
 
-  return (
-    <AuthContext.Provider
-      value={{
-        darkMode,
-        toggleDarkMode,
-        user,
-        loginUser,
-        loading,
-        labels,
-        updateAvatar,
-        avatarUrl,
-        setAvatarChanged,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+      const cachedAvatar = getCachedAvatar(userData.id);
+      if (cachedAvatar) {
+        setAvatarUrl(cachedAvatar);
+      } else {
+        const avatarBlob = await fetchAndCacheAvatar(userData.avatarUrl, userData.id);
+        if (avatarBlob) {
+          setAvatarUrl(avatarBlob);
+        }
+      }
+    },
+    [getCachedAvatar, fetchAndCacheAvatar]
   );
+
+  const updateAvatar = useCallback(
+    async (newAvatarUrl) => {
+      if (!user?.id) return;
+
+      // Clear old cache
+      localStorage.removeItem(`avatar_${user.id}`);
+      localStorage.removeItem(`avatar_${user.id}_timestamp`);
+
+      // Load new avatar
+      const avatarBlob = await fetchAndCacheAvatar(newAvatarUrl, user.id);
+      if (avatarBlob) {
+        setAvatarUrl(avatarBlob);
+      }
+    },
+    [user?.id, fetchAndCacheAvatar]
+  );
+
+  // Auth management
+  const loginUser = useCallback(
+    async (userData) => {
+      try {
+        if (!userData) {
+          setUser(null);
+          setAvatarUrl(null);
+          localStorage.removeItem("user");
+          return;
+        }
+
+        const userToSet = userData;
+
+        // Set user state FIRST
+        setUser(userToSet);
+
+        // Save to localStorage immediately
+        localStorage.setItem("user", JSON.stringify(userToSet));
+
+        // Load avatar in background (don't wait for it)
+        loadAvatar(userToSet).catch((err) => {
+          console.error("Avatar loading failed:", err);
+        });
+      } catch (error) {
+        console.error("Login error:", error);
+        setAuthError("Failed to login");
+      }
+    },
+    [loadAvatar]
+  );
+
+  const fetchUserProfile = useCallback(async () => {
+    if (authFetchRef.current) {
+      return;
+    }
+
+    try {
+      authFetchRef.current = true;
+      setLoading(true);
+      setAuthError(null);
+
+      const res = await fetch(`${apiUrl}/users/me`, {
+        method: "GET",
+        credentials: "include",
+      });
+
+      const data = await res.json();
+
+      if (data.success && data.data) {
+        setUser(data.data);
+        localStorage.setItem("user", JSON.stringify(data.data));
+
+        // Load avatar in background
+        loadAvatar(data.data).catch((err) => {
+          console.error("Avatar loading failed:", err);
+        });
+      } else {
+        setUser(null);
+        setAvatarUrl(null);
+        localStorage.removeItem("user");
+      }
+    } catch (error) {
+      console.error("❌ Failed to fetch user profile:", error);
+      setAuthError("Failed to fetch user profile");
+      setUser(null);
+      setAvatarUrl(null);
+      localStorage.removeItem("user");
+    } finally {
+      setLoading(false);
+      authFetchRef.current = false;
+    }
+  }, [loadAvatar]);
+
+  // Labels management
+  const fetchLabels = useCallback(async () => {
+    if (labelsFetchRef.current) return;
+
+    try {
+      labelsFetchRef.current = true;
+      setLabelsLoading(true);
+
+      const filters = await getFilters();
+      setLabels(filters);
+    } catch (error) {
+      console.error("Failed to fetch labels:", error);
+    } finally {
+      setLabelsLoading(false);
+      labelsFetchRef.current = false;
+    }
+  }, []);
+
+  // Initialize auth on mount
+  useEffect(() => {
+    // Check localStorage first
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      try {
+        const userData = JSON.parse(savedUser);
+        setUser(userData);
+        setLoading(false); // Important: stop loading immediately
+
+        // Load avatar in background
+        loadAvatar(userData).catch((err) => {
+          console.error("Avatar loading failed:", err);
+        });
+      } catch (error) {
+        console.error("Failed to parse saved user:", error);
+        localStorage.removeItem("user");
+        fetchUserProfile();
+      }
+    } else {
+      fetchUserProfile();
+    }
+  }, [fetchUserProfile, loadAvatar]);
+
+  // Load labels on mount
+  useEffect(() => {
+    fetchLabels();
+  }, [fetchLabels]);
+
+  // Logout function
+  const logout = useCallback(async () => {
+    try {
+      const res = await fetch(`${apiUrl}/auth/logout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setUser(null);
+        setAvatarUrl(null);
+        localStorage.removeItem("user");
+
+        // Clear avatar cache
+        if (user?.id) {
+          localStorage.removeItem(`avatar_${user.id}`);
+          localStorage.removeItem(`avatar_${user.id}_timestamp`);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to log out:", error);
+    }
+  }, [user?.id]);
+
+  const contextValue = {
+    // Theme
+    darkMode,
+    toggleDarkMode,
+
+    // Auth
+    user,
+    loading,
+    authError,
+    loginUser,
+    logout,
+
+    // Avatar
+    avatarUrl,
+    avatarLoading,
+    updateAvatar,
+
+    // Labels
+    labels,
+    labelsLoading,
+    fetchLabels,
+  };
+
+  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 }

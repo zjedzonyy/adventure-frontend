@@ -62,7 +62,6 @@ export default function SentFollowRequests({ isExpanded, setIsExpanded }) {
     }
   };
 
-  console.log("Sent Follow Requests:", requests);
   return (
     <div className="w-full">
       <DropdownSection

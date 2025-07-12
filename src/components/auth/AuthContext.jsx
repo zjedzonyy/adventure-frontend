@@ -155,39 +155,50 @@ export function AuthProvider({ children }) {
     [user?.id, fetchAndCacheAvatar]
   );
 
-  // Auth management
   const loginUser = useCallback(
     async (userData) => {
       try {
+        console.log("loginUser called with:", userData);
+
         if (!userData) {
+          console.log("No userData provided, clearing user");
           setUser(null);
           setAvatarUrl(null);
           localStorage.removeItem("user");
           return;
         }
 
-        const userToSet = userData;
+        console.log("✅ Setting user immediately:", userData);
 
         // Set user state FIRST
-        setUser(userToSet);
+        setUser(userData);
 
         // Save to localStorage immediately
-        localStorage.setItem("user", JSON.stringify(userToSet));
+        localStorage.setItem("user", JSON.stringify(userData));
+
+        console.log(" User set in state and localStorage");
+
+        // Verify what's actually in localStorage
+        const savedCheck = localStorage.getItem("user");
+        console.log(
+          " Verification - localStorage contains:",
+          savedCheck ? JSON.parse(savedCheck) : "null"
+        );
 
         // Load avatar in background (don't wait for it)
-        loadAvatar(userToSet).catch((err) => {
+        loadAvatar(userData).catch((err) => {
           console.error("Avatar loading failed:", err);
         });
       } catch (error) {
-        console.error("Login error:", error);
+        console.error(" Login error:", error);
         setAuthError("Failed to login");
       }
     },
     [loadAvatar]
   );
-
   const fetchUserProfile = useCallback(async () => {
     if (authFetchRef.current) {
+      console.log("Auth fetch already in progress, skipping...");
       return;
     }
 
@@ -196,14 +207,21 @@ export function AuthProvider({ children }) {
       setLoading(true);
       setAuthError(null);
 
+      console.log("Fetching user profile from:", `${apiUrl}/users/me`);
+
       const res = await fetch(`${apiUrl}/users/me`, {
         method: "GET",
         credentials: "include",
       });
 
+      console.log(" Fetch response status:", res.status);
+      console.log("Fetch response headers:", Object.fromEntries(res.headers.entries()));
+
       const data = await res.json();
+      console.log(" Fetch response data:", data);
 
       if (data.success && data.data) {
+        console.log("Setting user from fetch:", data.data);
         setUser(data.data);
         localStorage.setItem("user", JSON.stringify(data.data));
 
@@ -212,6 +230,7 @@ export function AuthProvider({ children }) {
           console.error("Avatar loading failed:", err);
         });
       } else {
+        console.log("No user data in response, clearing state");
         setUser(null);
         setAvatarUrl(null);
         localStorage.removeItem("user");
@@ -223,6 +242,7 @@ export function AuthProvider({ children }) {
       setAvatarUrl(null);
       localStorage.removeItem("user");
     } finally {
+      console.log("Fetch complete, setting loading to false");
       setLoading(false);
       authFetchRef.current = false;
     }
@@ -248,27 +268,35 @@ export function AuthProvider({ children }) {
 
   // Initialize auth on mount
   useEffect(() => {
-    // Check localStorage first
-    const savedUser = localStorage.getItem("user");
-    if (savedUser) {
-      try {
-        const userData = JSON.parse(savedUser);
-        setUser(userData);
-        setLoading(false); // Important: stop loading immediately
+    const initializeAuth = async () => {
+      console.log("🔍 Initializing auth...");
 
-        // Load avatar in background
-        loadAvatar(userData).catch((err) => {
-          console.error("Avatar loading failed:", err);
-        });
-      } catch (error) {
-        console.error("Failed to parse saved user:", error);
-        localStorage.removeItem("user");
-        fetchUserProfile();
+      // Check localStorage first
+      const savedUser = localStorage.getItem("user");
+      if (savedUser) {
+        try {
+          const userData = JSON.parse(savedUser);
+          console.log("Found user in localStorage:", userData);
+          setUser(userData);
+          setLoading(false);
+
+          // Load avatar in background
+          loadAvatar(userData).catch((err) => {
+            console.error("Avatar loading failed:", err);
+          });
+        } catch (error) {
+          console.error("Failed to parse saved user:", error);
+          localStorage.removeItem("user");
+          await fetchUserProfile();
+        }
+      } else {
+        console.log("No user in localStorage, fetching from server...");
+        await fetchUserProfile();
       }
-    } else {
-      fetchUserProfile();
-    }
-  }, [fetchUserProfile, loadAvatar]);
+    };
+
+    initializeAuth();
+  }, []);
 
   // Load labels on mount
   useEffect(() => {

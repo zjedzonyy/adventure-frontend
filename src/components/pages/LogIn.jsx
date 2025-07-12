@@ -62,8 +62,8 @@ export default function LogIn() {
           setError(data.message);
         } else {
           // Handle successful demo login
-          loginUser(data.user);
-          const from = location.state?.from?.pathname || "/";
+          await loginUser(data.data);
+          const from = location.state?.from || "/";
           navigate(from, { replace: true }); // Redirect to destination or homepage after demo login
         }
       } catch (error) {
@@ -88,7 +88,7 @@ export default function LogIn() {
         setError(data.message);
       } else {
         // Handle successful demo login
-        loginUser(data.data);
+        await loginUser(data.data);
         const from = location.state?.from || "/";
         navigate(from, { replace: true }); // Redirect to destination or homepage after demo login
       }

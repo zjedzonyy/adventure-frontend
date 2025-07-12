@@ -5,6 +5,7 @@ import { AuthContext } from "../auth/index.js";
 import { DropdownSection, FollowRequestItem } from "./index.js";
 import { apiUrl } from "../../utils/index.js";
 import { useParams } from "react-router-dom";
+import { useSocialContext } from "./SocialContext.jsx";
 
 export default function Followers({ isExpanded, setIsExpanded }) {
   const { user } = useContext(AuthContext);
@@ -15,6 +16,7 @@ export default function Followers({ isExpanded, setIsExpanded }) {
   const [error, setError] = useState(null);
   const [processingIds, setProcessingIds] = useState(new Set());
   const userIdFixed = userId ? userId : user.id;
+  const { refreshTrigger } = useSocialContext();
 
   // Fetch followers
   useEffect(() => {
@@ -39,7 +41,7 @@ export default function Followers({ isExpanded, setIsExpanded }) {
       }
     };
     fetchrequests();
-  }, []);
+  }, [isExpanded, refreshTrigger]);
 
   // Remove follower
   const onCancel = async (followerId) => {

@@ -11,7 +11,6 @@ import {
   Plus,
   User,
   Calendar,
-  Trophy,
   BookOpen,
   Target,
   Edit3,
@@ -23,7 +22,6 @@ import {
   Lock,
   ExternalLink,
 } from "lucide-react";
-import { a } from "framer-motion/client";
 
 export default function UsersProfile() {
   const { userId } = useParams(); // Get user ID from URL params
@@ -153,7 +151,7 @@ export default function UsersProfile() {
         // If we just started following and currently have basic access, refetch profile
         if (!isFollowing && userDataLevel === "basic") {
           // Refetch profile to get updated data with potentially higher access level
-          window.location.reload(); // Simple approach, or you could refetch manually
+          window.location.reload();
         }
       }
     } catch (error) {
@@ -179,8 +177,6 @@ export default function UsersProfile() {
 
   // If loading, show a loading state
   // If userData is not found, show a "User not found" message
-  if (loading)
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   if (!userData)
     return <div className="min-h-screen flex items-center justify-center">User not found</div>;
 

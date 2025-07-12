@@ -53,7 +53,7 @@ export default function Comments({
         credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to delete comment");
-      setClicked((prev) => !prev);
+      setClicked();
     } catch (error) {
       console.error("Error deleting comment:", error);
     }
@@ -68,7 +68,7 @@ export default function Comments({
         body: JSON.stringify({ description: editedContent }),
       });
       if (!res.ok) throw new Error("Failed to edit comment");
-      setClicked((prev) => !prev);
+      setClicked();
       setEditedCommentId(null);
       setEditedContent("");
     } catch (error) {
@@ -149,108 +149,120 @@ export default function Comments({
             setCommentSortChange={setCommentSortChange}
           /> */}
           {comments.map((comment) => (
-            <div
-              key={comment.id}
-              className="flex space-x-4 p-6 bg-gray-50 dark:bg-gray-700 rounded-lg flex-col sm:flex-row"
-            >
-              <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
-                  {renderAvatar(comment.author.avatarUrl, comment.author.username)}
+            <div key={comment.id} className="p-4 sm:p-6 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <div className="flex space-x-3 sm:space-x-4">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
+                    {renderAvatar(comment.author.avatarUrl, comment.author.username)}
+                  </div>
                 </div>
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-semibold flex text-gray-900 dark:text-white">
-                    {comment.author.username}
-                    <p className="pl-2">{comment.author.userIdeaRating || "Not rated"}</p>
-                  </h4>
-                  <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
-                    <Calendar className="w-4 h-4 mr-1" />
-                    {new Date(comment.createdAt).toLocaleDateString("pl-PL")}
-                  </span>
-                </div>
-                <p className="text-gray-600 dark:text-gray-300 mb-3 leading-relaxed">
-                  {comment.description}
-                </p>
-                <div className="flex items-center space-x-5 text-sm mb-3 py-2">
-                  <button
-                    onClick={() => handleLikeComment(comment.id)}
-                    className="text-gray-500 hover:text-blue-500 flex items-center space-x-1 mr-auto transition-colors"
-                  >
-                    <ThumbsUp className="w-4 h-4" />
-                    <span>{comment.commentLikes || 0}</span>
-                  </button>
-                  {user && user.username === comment.author.username && (
-                    <div className="flex items-center space-x-3">
-                      <button
-                        onClick={() => {
-                          setEditedCommentId(comment.id);
-                          setEditedContent(comment.description);
-                        }}
-                        className="text-gray-500 hover:text-yellow-500 transition-colors"
-                      >
-                        <Edit3 className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteComment(comment.id)}
-                        className="text-gray-500 hover:text-red-500 transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-1">
+                    <div className="flex items-center space-x-2">
+                      <h4 className="font-semibold text-gray-900 dark:text-white text-sm sm:text-base">
+                        {comment.author.username}
+                      </h4>
+                      <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded">
+                        {comment.author.userIdeaRating || "Not rated"}
+                      </span>
                     </div>
-                  )}
-                  <button
-                    onClick={() => console.log("Report comment", comment.id)}
-                    className="text-gray-500 hover:text-red-500 transition-colors"
-                  >
-                    <Flag className="w-4 h-4" />
-                  </button>
-                </div>
-                {editedCommentId === comment.id && (
-                  <div className="w-full">
-                    <textarea
-                      value={editedContent}
-                      onChange={(e) => setEditedContent(e.target.value)}
-                      rows="4"
-                      className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-800 dark:text-white resize-none transition"
-                      placeholder="Edit your comment..."
-                    />
-                    <div className="flex justify-end space-x-2 mt-2">
+                    <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 flex items-center">
+                      <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                      {new Date(comment.createdAt).toLocaleDateString("pl-PL")}
+                    </span>
+                  </div>
+
+                  <p className="text-gray-600 dark:text-gray-300 mb-3 leading-relaxed text-sm sm:text-base">
+                    {comment.description}
+                  </p>
+
+                  <div className="flex items-center justify-between">
+                    <button
+                      onClick={() => handleLikeComment(comment.id)}
+                      className="text-gray-500 hover:text-blue-500 flex items-center space-x-1 transition-colors"
+                    >
+                      <ThumbsUp className="w-4 h-4" />
+                      <span className="text-sm">{comment.commentLikes || 0}</span>
+                    </button>
+
+                    <div className="flex items-center space-x-2 sm:space-x-3">
+                      {user && user.username === comment.author.username && (
+                        <>
+                          <button
+                            onClick={() => {
+                              setEditedCommentId(comment.id);
+                              setEditedContent(comment.description);
+                            }}
+                            className="text-gray-500 hover:text-yellow-500 transition-colors p-1"
+                          >
+                            <Edit3 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteComment(comment.id)}
+                            className="text-gray-500 hover:text-red-500 transition-colors p-1"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </>
+                      )}
                       <button
-                        onClick={() => handleEditComment(comment.id)}
-                        className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+                        onClick={() => console.log("Report comment", comment.id)}
+                        className="text-gray-500 hover:text-red-500 transition-colors p-1"
                       >
-                        Save
-                      </button>
-                      <button
-                        onClick={() => setEditedCommentId(null)}
-                        className="bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-white px-4 py-2 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
-                      >
-                        Cancel
+                        <Flag className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
-                )}
+
+                  {editedCommentId === comment.id && (
+                    <div className="mt-3 w-full">
+                      <textarea
+                        value={editedContent}
+                        onChange={(e) => setEditedContent(e.target.value)}
+                        rows="4"
+                        className="w-full p-3 sm:p-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-800 dark:text-white resize-none transition text-sm sm:text-base"
+                        placeholder="Edit your comment..."
+                      />
+                      <div className="flex flex-col sm:flex-row justify-end gap-2 mt-2">
+                        <button
+                          onClick={() => handleEditComment(comment.id)}
+                          className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm sm:text-base"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={() => setEditedCommentId(null)}
+                          className="bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-white px-4 py-2 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors text-sm sm:text-base"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ))}
         </div>
+
+        {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-center space-x-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 px-4">
             <button
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="flex items-center space-x-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center space-x-2 px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
-              <span>Previous</span>
+              <span className="text-sm">Previous</span>
             </button>
-            <div className="flex items-center space-x-2">
+
+            <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide max-w-full px-1">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`px-3 py-2 rounded-lg transition-colors ${
+                  className={`px-2 sm:px-3 py-2 rounded-lg transition-colors text-sm flex-shrink-0 min-w-[32px] sm:min-w-[36px] ${
                     page === currentPage
                       ? "bg-purple-600 text-white"
                       : "border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
@@ -260,12 +272,13 @@ export default function Comments({
                 </button>
               ))}
             </div>
+
             <button
               onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
-              className="flex items-center space-x-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center space-x-2 px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              <span>Next</span>
+              <span className="text-sm">Next</span>
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>

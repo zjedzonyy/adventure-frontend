@@ -396,23 +396,23 @@ export default function SearchIdeas() {
               <div>
                 {/* Pagination */}
                 {totalPages > 1 && (
-                  <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <div className="flex items-center gap-1">
+                  <div className="mt-10 flex items-center justify-center">
+                    <div className="flex items-center gap-1 max-w-full overflow-hidden">
                       <button
                         onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                         disabled={currentPage === 1}
-                        className="flex items-center justify-center p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="flex items-center justify-center p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-shrink-0"
                       >
-                        <ChevronLeft className="w-5 h-5" />
+                        <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                       </button>
 
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide px-1">
                         {getDisplayedPages(currentPage, totalPages).map((page, i) => (
                           <button
                             key={i}
                             onClick={() => typeof page === "number" && setCurrentPage(page)}
                             disabled={page === "..."}
-                            className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors text-sm font-medium ${
+                            className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg transition-colors text-xs sm:text-sm font-medium flex-shrink-0 ${
                               page === currentPage
                                 ? "bg-purple-600 text-white shadow-sm"
                                 : page === "..."
@@ -428,9 +428,9 @@ export default function SearchIdeas() {
                       <button
                         onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                         disabled={currentPage === totalPages}
-                        className="flex items-center justify-center p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="flex items-center justify-center p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-shrink-0"
                       >
-                        <ChevronRight className="w-5 h-5" />
+                        <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
                       </button>
                     </div>
                   </div>

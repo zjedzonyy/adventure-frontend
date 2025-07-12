@@ -25,7 +25,7 @@ export default function Navbar() {
 
   return (
     <header className="bg-white dark:bg-dark_background shadow-sm border-b border-background dark:border-dark_background">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div key={user?.id} className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo and Title */}
           <div className="flex items-center space-x-2 sm:space-x-4">
@@ -53,9 +53,11 @@ export default function Navbar() {
                 Add
               </NavLink>
             </div>
-            <div className="ml-8 max-w-md w-full">
-              <UserSearchBar />
-            </div>
+            {user && (
+              <div className="ml-8 max-w-md w-full">
+                <UserSearchBar />
+              </div>
+            )}
           </nav>
 
           {/* Desktop user avatar */}
@@ -218,7 +220,7 @@ export default function Navbar() {
         {/* Mobile menu panel */}
         {mobileMenuOpen && (
           <nav className="lg:hidden mt-2 space-y-2 pb-4 border-b border-gray-200 dark:border-gray-700">
-            <UserSearchBar />
+            {user && <UserSearchBar />}
             <NavLink
               to="/ideas/search"
               onClick={() => setMobileMenuOpen(false)}

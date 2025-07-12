@@ -4,6 +4,7 @@ import { Eye } from "lucide-react";
 import { AuthContext } from "../auth/index.js";
 import { DropdownSection, FollowRequestItem } from "./index.js";
 import { apiUrl } from "../../utils/index.js";
+import { useSocialContext } from "./SocialContext.jsx";
 
 import { useParams } from "react-router-dom";
 
@@ -16,6 +17,7 @@ export default function Followings({ isExpanded, setIsExpanded }) {
   const [error, setError] = useState(null);
   const [processingIds, setProcessingIds] = useState(new Set());
   const userIdFixed = userId ? userId : user.id;
+  const { refreshTrigger } = useSocialContext();
 
   // Fetch followings
   useEffect(() => {
@@ -40,7 +42,7 @@ export default function Followings({ isExpanded, setIsExpanded }) {
       }
     };
     fetchrequests();
-  }, []);
+  }, [isExpanded, refreshTrigger]);
 
   // Sop following user
   const onCancel = async (followingsId) => {

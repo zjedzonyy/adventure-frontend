@@ -48,26 +48,45 @@ export default function LogIn() {
 
   const handleSubmit = async (e) => {
     if (validate()) {
-      // If all validations pass, proceed with form submission
       e.preventDefault();
       try {
+        console.log("Sending login request to:", `${apiUrl}/auth/login`);
+        console.log("Login data:", registerData);
+
         const res = await fetch(`${apiUrl}/auth/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(registerData),
           credentials: "include",
         });
+
+        console.log(" Login response status:", res.status);
+        console.log(" Login response headers:", Object.fromEntries(res.headers.entries()));
+
         const data = await res.json();
+        console.log("Login response data:", data);
+
         if (data.name) {
+          console.log("Login failed:", data.message);
           setError(data.message);
         } else {
-          // Handle successful demo login
+          console.log("Login successful, calling loginUser with:", data.data);
+
+          // Call loginUser and wait for it
           await loginUser(data.data);
+
+          console.log("loginUser completed");
+
+          // Double check user state
+          console.log(" Current user context after login:", user);
+
           const from = location.state?.from || "/";
-          navigate(from, { replace: true }); // Redirect to destination or homepage after demo login
+          console.log("Navigating to:", from);
+          navigate(from, { replace: true });
         }
       } catch (error) {
-        console.error(error);
+        console.error(" Login request failed:", error);
+        setError("Login failed. Please try again.");
       }
     } else {
       setError("Please fill in all fields correctly:");

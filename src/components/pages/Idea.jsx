@@ -1,8 +1,8 @@
 import React, { use, useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import MDEditor from "@uiw/react-md-editor";
+import { Atom } from "react-loading-indicators";
 
-import { AuthContext } from "../auth/index.js";
 import { Navbar, Footer, MainBackground } from "../layout/index.js";
 import { Comments } from "../ideas/index.js";
 import { StarRating } from "../ui/index.js";
@@ -27,14 +27,13 @@ import {
 
 export default function Idea() {
   const { ideaId } = useParams();
-  const { user } = useContext(AuthContext);
   const [ideaData, setIdeaData] = useState(null);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [userStatus, setUserStatus] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [currentCommentPage, setCurrentCommentPage] = useState(1);
-  const [clicked, setClicked] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const [currentPage, setCurrentPage] = useState(1);
   const commentsPerPage = 5;
@@ -91,7 +90,7 @@ export default function Idea() {
 
     fetchIdeaData();
     fetchComments();
-  }, [ideaId, clicked, currentPage, commentSortChange]);
+  }, [ideaId, refreshTrigger, currentPage, commentSortChange]);
 
   useEffect(() => {
     const fetchUserRating = async () => {
@@ -114,7 +113,7 @@ export default function Idea() {
   }, [ratingClicked, ideaId]);
 
   const handleLikeComment = async (commentId) => {
-    setClicked(!clicked);
+    setRefreshTrigger((prev) => prev + 1);
     try {
       const res = await fetch(`${apiUrl}/comments/${commentId}/like`, {
         method: "POST",
@@ -140,8 +139,6 @@ export default function Idea() {
   };
 
   const handleAddComment = async () => {
-    setClicked(!clicked);
-
     if (!newComment.trim()) return;
 
     try {
@@ -154,6 +151,7 @@ export default function Idea() {
       const data = await res.json();
       if (data.success) {
         setNewComment("");
+        setRefreshTrigger((prev) => prev + 1);
       }
     } catch (error) {
       console.error("Failed to add comment:", error);
@@ -224,16 +222,16 @@ export default function Idea() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="bg-gray-50 dark:bg-dark_background min-h-screen">
-        <Navbar />
-        <div className="flex items-center justify-center h-64">
-          <div className="text-lg text-gray-600 dark:text-text_secondary">Loading...</div>
-        </div>
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="bg-gray-50 dark:bg-dark_background min-h-screen">
+  //       <Navbar />
+  //       <div className="flex items-center justify-center h-64">
+  //         <div className="text-lg text-gray-600 dark:text-text_secondary">Loading...</div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   // If ideaData or comments are not available, show a not found message
   if (!ideaData) {
@@ -415,7 +413,7 @@ export default function Idea() {
             </div>
 
             {/* Rating and Actions Section */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-8 p-6 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-gray-700 dark:to-gray-600 rounded-lg">
+            <div className="flex flex-col sm:flex-row items-center sm:items-center justify-between gap-6 mb-8 p-6 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-gray-700 dark:to-gray-600 rounded-lg">
               <div className="flex items-center space-x-6">
                 <div>
                   <div className="flex items-center space-x-1">
@@ -435,11 +433,11 @@ export default function Idea() {
                 </div>
               </div>
 
-              <div className="flex flex-col items-center space-x-4 gap-2">
+              <div className="flex flex-col items-center sm:space-x-4 gap-2">
                 <select
                   value={userStatus || ""}
                   onChange={(e) => handleStatusChange(e.target.value)}
-                  className="p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  className="p-1 sm:p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 >
                   <option value="">Select status</option>
                   <option value="TODO">Add to TODO</option>
@@ -485,7 +483,7 @@ export default function Idea() {
           setNewComment={setNewComment}
           handleAddComment={handleAddComment}
           handleLikeComment={handleLikeComment}
-          setClicked={setClicked}
+          setClicked={() => setRefreshTrigger((prev) => prev + 1)}
           commentSortChange={commentSortChange}
           setCommentSortChange={setCommentSortChange}
           commentSort={commentSort}

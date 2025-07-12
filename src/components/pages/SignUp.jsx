@@ -1,23 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { apiUrl } from "../../utils/api.js";
-import {
-  Search,
-  Compass,
-  Users,
-  Heart,
-  Star,
-  Plus,
-  User,
-  Mail,
-  Lock,
-  Eye,
-  EyeOff,
-  AlertCircle,
-  Sun,
-  Moon,
-} from "lucide-react";
+import { User, Mail, Lock, Eye, EyeOff, AlertCircle, Sun, Moon } from "lucide-react";
 import { AuthContext } from "../auth/index.js";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function SignUp() {
   const [registerData, setRegisterData] = useState({
@@ -38,6 +24,7 @@ export default function SignUp() {
   });
 
   const { darkMode, toggleDarkMode } = React.useContext(AuthContext);
+  const navigate = useNavigate();
 
   // If registerData.password and confirmPassword are not empty and do not match, show an error message
   const validateConfirmPassword = (password, confirm) => {
@@ -80,9 +67,10 @@ export default function SignUp() {
   };
 
   const handleSubmit = async (e) => {
+    e.preventDefault();
+
     if (validateEmail() && validatePassword() && validateConfirmPassword()) {
       // If all validations pass, proceed with form submission
-      e.preventDefault();
       try {
         const res = await fetch(`${apiUrl}/auth/register`, {
           method: "POST",
@@ -101,9 +89,10 @@ export default function SignUp() {
             return newError;
           });
         }
-        if (!data.field && data.name) {
-          setBackendData(data);
-        }
+
+        setBackendData(data);
+        alert("Account created successfully!");
+        navigate("/login");
       } catch (error) {
         console.error(error);
       }

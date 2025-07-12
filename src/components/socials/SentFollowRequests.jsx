@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { DropdownSection, FollowRequestItem } from "./index.js";
 import { apiUrl } from "../../utils/index.js";
+import { useSocialContext } from "./SocialContext.jsx";
 
 import { Send } from "lucide-react";
 
@@ -10,6 +11,7 @@ export default function SentFollowRequests({ isExpanded, setIsExpanded }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [processingIds, setProcessingIds] = useState(new Set());
+  const { refreshTrigger } = useSocialContext();
 
   useEffect(() => {
     const fetchrequests = async () => {
@@ -33,7 +35,7 @@ export default function SentFollowRequests({ isExpanded, setIsExpanded }) {
       }
     };
     fetchrequests();
-  }, []);
+  }, [refreshTrigger]);
 
   const onCancel = async (requestId) => {
     setProcessingIds((prev) => new Set(prev).add(requestId));

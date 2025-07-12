@@ -33,14 +33,14 @@ export function AuthProvider({ children }) {
   const labelsFetchRef = useRef(false);
 
   // DEBUG: Console log every state change
-  // useEffect(() => {
-  //   console.log("AUTH STATE CHANGE:", {
-  //     user: user ? { id: user.id, email: user.email } : null,
-  //     loading,
-  //     avatarUrl: avatarUrl ? "present" : "null",
-  //     timestamp: new Date().toISOString(),
-  //   });
-  // }, [user, loading, avatarUrl]);
+  useEffect(() => {
+    console.log("AUTH STATE CHANGE:", {
+      user: user ? { id: user.id, email: user.email } : null,
+      loading,
+      avatarUrl: avatarUrl ? "present" : "null",
+      timestamp: new Date().toISOString(),
+    });
+  }, [user, loading, avatarUrl]);
 
   // Theme management
   const toggleDarkMode = useCallback(() => {
@@ -217,7 +217,7 @@ export function AuthProvider({ children }) {
         localStorage.removeItem("user");
       }
     } catch (error) {
-      console.error("❌ Failed to fetch user profile:", error);
+      console.error("Failed to fetch user profile:", error);
       setAuthError("Failed to fetch user profile");
       setUser(null);
       setAvatarUrl(null);

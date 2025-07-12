@@ -4,12 +4,14 @@ import { DropdownSection, FollowRequestItem } from "../socials/index.js";
 import { apiUrl } from "../../utils/index.js";
 
 import { Users } from "lucide-react";
+import { useSocialContext } from "./SocialContext.jsx";
 
 export default function PendingFollowRequests({ isExpanded, setIsExpanded }) {
   const [followingRequests, setFollowingRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [processingIds, setProcessingIds] = useState(new Set());
+  const { refreshTrigger } = useSocialContext();
 
   useEffect(() => {
     const fetchFollowingRequests = async () => {
@@ -33,7 +35,7 @@ export default function PendingFollowRequests({ isExpanded, setIsExpanded }) {
       }
     };
     fetchFollowingRequests();
-  }, []);
+  }, [refreshTrigger]);
 
   const onAccept = async (requestId) => {
     setProcessingIds((prev) => new Set(prev).add(requestId));

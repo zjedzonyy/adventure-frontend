@@ -1,7 +1,7 @@
 import { useContext, useState, useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { AuthContext } from "./index";
-import { Atom } from "react-loading-indicators";
+import { LoadingWrapper } from "../common/index";
 
 // This component checks if the user is authenticated.
 // If not, it redirects them to the login page.
@@ -9,25 +9,10 @@ import { Atom } from "react-loading-indicators";
 export default function RequireAuth({ children }) {
   const { user, loading } = useContext(AuthContext);
   const location = useLocation();
-  const [showSpinner, setShowSpinner] = useState(false);
 
-  useEffect(() => {
-    const timeout = setTimeout(() => setShowSpinner(true), 300); // show spinner ONLY after 300ms
-
-    return () => clearTimeout(timeout);
-  }, []);
-
-  if (loading) {
-    return showSpinner ? (
-      <div className="min-h-screen flex items-center justify-center">
-        <Atom color="#c031cc" size="large" text="" textColor="" />
-      </div>
-    ) : null;
-  }
-
-  if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-
-  return children;
+  return (
+    <LoadingWrapper loading={loading}>
+      {!user ? <Navigate to="/login" state={{ from: location }} replace /> : children}
+    </LoadingWrapper>
+  );
 }

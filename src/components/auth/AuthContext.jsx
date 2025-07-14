@@ -35,7 +35,7 @@ export function AuthProvider({ children }) {
   // DEBUG: Console log every state change
   useEffect(() => {
     console.log("AUTH STATE CHANGE:", {
-      user: user ? { id: user.id, email: user.email } : null,
+      user: user ? { id: user.id, username: user.username } : null,
       loading,
       avatarUrl: avatarUrl ? "present" : "null",
       timestamp: new Date().toISOString(),
@@ -167,9 +167,7 @@ export function AuthProvider({ children }) {
           localStorage.removeItem("user");
           return;
         }
-
         console.log("✅ Setting user immediately:", userData);
-
         // Set user state FIRST
         setUser(userData);
 
@@ -213,7 +211,6 @@ export function AuthProvider({ children }) {
         method: "GET",
         credentials: "include",
       });
-
       console.log(" Fetch response status:", res.status);
       console.log("Fetch response headers:", Object.fromEntries(res.headers.entries()));
 

@@ -1,18 +1,22 @@
 import { Navbar, Footer } from "../layout/index.js";
 import { IdeaCard } from "../ideas/index.js";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { apiUrl } from "../../utils/api";
 
 import { Filter, X, ChevronLeft, ChevronRight, Award } from "lucide-react";
+import AuthContext from "../auth/AuthContext.jsx";
+import { LoadingWrapper } from "../common/index.js";
+import { del } from "framer-motion/client";
 
 export default function SearchIdeas() {
+  const { labels } = useContext(AuthContext);
   const [filters, setFilters] = useState({});
   const [ideas, setIdeas] = useState([]);
 
-  const [categories, setCategories] = useState([]);
-  const [durations, setDurations] = useState([]);
-  const [priceRanges, setPriceRanges] = useState([]);
-  const [groupSizes, setGroupSizes] = useState([]);
+  // const [categories, setCategories] = useState([]);
+  // const [durations, setDurations] = useState([]);
+  // const [priceRanges, setPriceRanges] = useState([]);
+  // const [groupSizes, setGroupSizes] = useState([]);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -22,29 +26,30 @@ export default function SearchIdeas() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
-  useEffect(() => {
-    // Fetch hardcoded labels
-    const fetchFilters = async () => {
-      try {
-        const res = await fetch(`${apiUrl}/ideas/filters`, {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-        });
-        const data = await res.json();
-        if (res.ok) {
-          setCategories(data.data.categories || []);
-          setDurations(data.data.durations || []);
-          setPriceRanges(data.data.priceRanges || []);
-          setGroupSizes(data.data.groupSizes || []);
-        }
-      } catch (error) {
-        console.error("Error fetching filters:", error);
-      }
-    };
+  const [loading, setLoading] = useState(true);
 
-    fetchFilters();
-  }, []);
+  // useEffect(() => {
+  //   // Fetch hardcoded labels
+  //   // const fetchFilters = async () => {
+  //   //   try {
+  //   //     const res = await fetch(`${apiUrl}/ideas/filters`, {
+  //   //       method: "GET",
+  //   //       headers: { "Content-Type": "application/json" },
+  //   //       credentials: "include",
+  //   //     });
+  //   //     const data = await res.json();
+  //   //     if (res.ok) {
+  //   setCategories(data.data.categories || []);
+  //   setDurations(data.data.durations || []);
+  //   setPriceRanges(data.data.priceRanges || []);
+  //   setGroupSizes(data.data.groupSizes || []);
+  //   //   }
+  //   // } catch (error) {
+  //   //   console.error("Error fetching filters:", error);
+  //   // }
+
+  //   // fetchFilters();
+  // }, []);
 
   useEffect(() => {
     // Fetch ideas based on filters
@@ -89,6 +94,8 @@ export default function SearchIdeas() {
         }
       } catch (error) {
         console.error("Error fetching ideas:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchIdeas();
@@ -163,6 +170,7 @@ export default function SearchIdeas() {
 
           <div className="flex flex-col lg:flex-row gap-6">
             {/* Sidebar - Filters */}
+
             <div className="lg:w-80 lg:flex-shrink-0">
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700">
                 {/* Filter header */}
@@ -203,7 +211,7 @@ export default function SearchIdeas() {
                   </div>
 
                   {/* Categories */}
-                  {categories.length > 0 && (
+                  {labels.categories.length > 0 && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Categories
@@ -214,7 +222,7 @@ export default function SearchIdeas() {
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                       >
                         <option value="">All categories</option>
-                        {categories.map((cat) => (
+                        {labels.categories.map((cat) => (
                           <option key={cat.id} value={cat.id}>
                             {cat.label}
                           </option>
@@ -234,7 +242,7 @@ export default function SearchIdeas() {
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                     >
                       <option value="">All locations</option>
-                      {locationTypes.map((type) => (
+                      {labels.locationTypes.map((type) => (
                         <option key={type.value} value={type.value}>
                           {type.label}
                         </option>
@@ -243,7 +251,7 @@ export default function SearchIdeas() {
                   </div>
 
                   {/* Duration */}
-                  {durations.length > 0 && (
+                  {labels.durations.length > 0 && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Duration
@@ -254,7 +262,7 @@ export default function SearchIdeas() {
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                       >
                         <option value="">Any duration</option>
-                        {durations.map((duration) => (
+                        {labels.durations.map((duration) => (
                           <option key={duration.id} value={duration.id}>
                             {duration.label}
                           </option>
@@ -264,7 +272,7 @@ export default function SearchIdeas() {
                   )}
 
                   {/* Price Range */}
-                  {priceRanges.length > 0 && (
+                  {labels.priceRanges.length > 0 && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Price Range
@@ -275,7 +283,7 @@ export default function SearchIdeas() {
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                       >
                         <option value="">Any price</option>
-                        {priceRanges.map((price) => (
+                        {labels.priceRanges.map((price) => (
                           <option key={price.id} value={price.id}>
                             {price.label}
                           </option>
@@ -285,7 +293,7 @@ export default function SearchIdeas() {
                   )}
 
                   {/* Group Size */}
-                  {groupSizes.length > 0 && (
+                  {labels.groups.length > 0 && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Group Size
@@ -296,7 +304,7 @@ export default function SearchIdeas() {
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                       >
                         <option value="">Any size</option>
-                        {groupSizes.map((group) => (
+                        {labels.groups.map((group) => (
                           <option key={group.id} value={group.id}>
                             {group.label}
                           </option>
@@ -316,7 +324,7 @@ export default function SearchIdeas() {
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                     >
                       <option value="">All statuses</option>
-                      {statusTypes.map((status) => (
+                      {labels.statusTypes.map((status) => (
                         <option key={status.value} value={status.value}>
                           {status.label}
                         </option>
@@ -376,23 +384,25 @@ export default function SearchIdeas() {
             {/* Main content - Ideas list */}
             <div className="flex-1 min-w-0">
               {/* Ideas in single column */}
-              <div className="space-y-6">
-                {ideas.length > 0 ? (
-                  ideas.map((idea) => <IdeaCard key={idea.id} idea={idea} />)
-                ) : (
-                  <div className="text-center py-16">
-                    <div className="text-gray-400 dark:text-gray-500 mb-4">
-                      <Filter className="w-12 h-12 mx-auto mb-2" />
+              <LoadingWrapper loading={loading} page={false}>
+                <div className="space-y-6">
+                  {ideas.length > 0 ? (
+                    ideas.map((idea) => <IdeaCard key={idea.id} idea={idea} />)
+                  ) : (
+                    <div className="text-center py-16">
+                      <div className="text-gray-400 dark:text-gray-500 mb-4">
+                        <Filter className="w-12 h-12 mx-auto mb-2" />
+                      </div>
+                      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                        No ideas found
+                      </h3>
+                      <p className="text-gray-500 dark:text-gray-400">
+                        No ideas match your current filters.
+                      </p>
                     </div>
-                    <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                      No ideas found
-                    </h3>
-                    <p className="text-gray-500 dark:text-gray-400">
-                      No ideas match your current filters.
-                    </p>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              </LoadingWrapper>
               <div>
                 {/* Pagination */}
                 {totalPages > 1 && (

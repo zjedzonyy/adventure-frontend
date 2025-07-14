@@ -1,4 +1,5 @@
 import { apiUrl } from "../../utils/index.js";
+import { LoadingWrapper } from "./index.js";
 
 import { useState, useEffect, useRef } from "react";
 import { Search, User, X } from "lucide-react";
@@ -110,64 +111,61 @@ export default function UserSearchBar() {
           ref={dropdownRef}
           className="absolute z-50 mt-2 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-80 overflow-y-auto"
         >
-          {isLoading ? (
-            <div className="px-4 py-3 text-center text-gray-500 dark:text-gray-400">
-              <div className="animate-spin h-4 w-4 border-2 border-purple-500 border-t-transparent rounded-full mx-auto"></div>
-              <span className="ml-2 text-sm">Searching...</span>
-            </div>
-          ) : searchResults.length > 0 ? (
-            <>
-              {searchResults.map((user) => (
-                <button
-                  key={user.id}
-                  onClick={() => handleUserClick(user)}
-                  className="w-full px-4 py-3 flex items-center space-x-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150 border-b border-gray-100 dark:border-gray-700 last:border-b-0"
-                >
-                  {/* Avatar */}
-                  <div className="flex-shrink-0">
-                    {user.avatarUrl ? (
-                      <img
-                        src={user.avatarUrl}
-                        alt={user.username}
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                        <User className="w-5 h-5 text-white" />
+          <LoadingWrapper loading={isLoading} page={false} size="small">
+            {searchResults.length > 0 ? (
+              <>
+                {searchResults.map((user) => (
+                  <button
+                    key={user.id}
+                    onClick={() => handleUserClick(user)}
+                    className="w-full px-4 py-3 flex items-center space-x-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150 border-b border-gray-100 dark:border-gray-700 last:border-b-0"
+                  >
+                    {/* Avatar */}
+                    <div className="flex-shrink-0">
+                      {user.avatarUrl ? (
+                        <img
+                          src={user.avatarUrl}
+                          alt={user.username}
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
+                          <User className="w-5 h-5 text-white" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* User Info */}
+                    <div className="flex-1 text-left">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {user.username}
+                      </p>
+                      {user.fullName && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{user.fullName}</p>
+                      )}
+                      {user.bio && (
+                        <p className="text-xs text-gray-400 dark:text-gray-500 truncate mt-1">
+                          {user.bio}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Follower count (optional) */}
+                    {user.followersCount !== undefined && (
+                      <div className="text-xs text-gray-400 dark:text-gray-500">
+                        {user.followersCount} followers
                       </div>
                     )}
-                  </div>
-
-                  {/* User Info */}
-                  <div className="flex-1 text-left">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      {user.username}
-                    </p>
-                    {user.fullName && (
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{user.fullName}</p>
-                    )}
-                    {user.bio && (
-                      <p className="text-xs text-gray-400 dark:text-gray-500 truncate mt-1">
-                        {user.bio}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Follower count (optional) */}
-                  {user.followersCount !== undefined && (
-                    <div className="text-xs text-gray-400 dark:text-gray-500">
-                      {user.followersCount} followers
-                    </div>
-                  )}
-                </button>
-              ))}
-            </>
-          ) : (
-            <div className="px-4 py-3 text-center text-gray-500 dark:text-gray-400">
-              <User className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">Couldn't find anyone</p>
-            </div>
-          )}
+                  </button>
+                ))}
+              </>
+            ) : (
+              <div className="px-4 py-3 text-center text-gray-500 dark:text-gray-400">
+                <User className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">Couldn't find anyone</p>
+              </div>
+            )}
+          </LoadingWrapper>
         </div>
       )}
     </div>

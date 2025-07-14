@@ -44,11 +44,6 @@ export default function IdeaCard({ idea }) {
     navigate(path);
   };
 
-  const getAuthorInitials = (authorId) => {
-    // Generate initials from usernames
-    return authorId.substring(0, 2).toUpperCase();
-  };
-
   return (
     <div
       onClick={() => navigateTo(`/idea/${idea.id}`)}

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../auth/index.js";
 import { Navbar, Footer } from "../layout/index.js";
 import { IdeaCard } from "../ideas/index.js";
+import { LoadingWrapper } from "../common/index.js";
 
 import { Compass, Users, Heart, Star, Plus, Dice1 } from "lucide-react";
 import { apiUrl } from "../../utils/api.js";
@@ -11,6 +12,11 @@ export default function Homepage() {
   const { user, darkMode, toggleDarkMode, labels } = React.useContext(AuthContext);
   const [sampleIdeas, setSampleIdeas] = useState(null);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+
+  function delay(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
 
   const handleRandomIdea = async () => {
     if (!user) {
@@ -57,6 +63,9 @@ export default function Homepage() {
         }
       } catch (err) {
         console.error(err);
+      } finally {
+        await delay(5000);
+        setLoading(false);
       }
     };
     getBestIdeas();
@@ -142,12 +151,13 @@ export default function Homepage() {
               Discover what others are loving right now
             </p>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {sampleIdeas?.map((idea) => (
-              <IdeaCard idea={idea}></IdeaCard>
-            ))}
-          </div>
+          <LoadingWrapper loading={loading} page={false}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {sampleIdeas?.map((idea) => (
+                <IdeaCard idea={idea}></IdeaCard>
+              ))}
+            </div>
+          </LoadingWrapper>
         </div>
       </section>
 

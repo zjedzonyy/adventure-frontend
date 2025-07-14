@@ -4,7 +4,7 @@ import MDEditor from "@uiw/react-md-editor";
 import { AuthContext } from "../auth/index.js";
 import { Navbar, Footer } from "../layout/index.js";
 import { apiUrl } from "../../utils/index.js";
-import { Atom } from "react-loading-indicators";
+import { LoadingWrapper } from "../common/index";
 
 import {
   FileText,
@@ -54,7 +54,6 @@ export default function AddIdea() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
-  const delay = (ms) => new Promise((res) => setTimeout(res, ms));
   // Initialize available options from labels and Idea data
   useEffect(() => {
     if (labels) {
@@ -105,7 +104,6 @@ export default function AddIdea() {
         setLoading(false);
       }
     };
-
     fetchIdeaData();
   }, [labels]);
 
@@ -216,9 +214,7 @@ export default function AddIdea() {
 
       if (data.success) {
         setSubmitSuccess(true);
-        setTimeout(() => {
-          navigate(`/idea/${data.ideaId}`);
-        }, 2000);
+        navigate(`/idea/${data.ideaId}`);
       } else {
         if (data.field && data.message) {
           setErrors((prev) => ({
@@ -236,14 +232,6 @@ export default function AddIdea() {
       setIsSubmitting(false);
     }
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Atom color="#c031cc" size="large" text="" textColor="" />
-      </div>
-    );
-  }
 
   if (user.username !== authorUsername && loading === false) {
     throw new Response("You can't access this page", { status: 403 });
@@ -266,7 +254,7 @@ export default function AddIdea() {
   }
 
   return (
-    <>
+    <LoadingWrapper loading={loading}>
       <Navbar></Navbar>
 
       <div className="max-w-4xl mx-auto">
@@ -565,6 +553,6 @@ export default function AddIdea() {
         </div>
       </div>
       <Footer></Footer>
-    </>
+    </LoadingWrapper>
   );
 }

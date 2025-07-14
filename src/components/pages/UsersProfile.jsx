@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../auth/index.js";
 import { Navbar, Footer } from "../layout/index.js";
 import { apiUrl } from "../../utils/index.js";
+import { LoadingWrapper } from "../common/index.js";
 
 import {
   Heart,
@@ -35,6 +36,7 @@ export default function UsersProfile() {
   const [savedExpanded, setSavedExpanded] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
   useEffect(() => {
     // Get sent requests
     const fetchSentFollowRequests = async () => {
@@ -189,379 +191,381 @@ export default function UsersProfile() {
       <Navbar />
 
       <div className="min-h-screen max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Profile Info */}
-          <div className="lg:col-span-1 space-y-6">
-            {/* Profile Card */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-6">
-              <div className="text-center">
-                <div className="w-24 h-24 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                  {/* Avatar */}
-                  {userData.avatarUrl ? (
-                    <img
-                      src={userData.avatarUrl}
-                      alt={userData.username}
-                      className="w-24 h-24 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-24 h-24 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                      <User className="w-12 h-12 text-white" />
-                    </div>
-                  )}
-                </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {userData?.username}
-                </h2>
-
-                {/* Follow/Unfollow Button */}
-                {!isOwnProfile && !sentFollowRequest && (
-                  <button
-                    onClick={handleFollowToggle}
-                    className={`mt-4 px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 mx-auto ${
-                      isFollowing
-                        ? "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
-                        : "bg-purple-600 text-white hover:bg-purple-700"
-                    }`}
-                  >
-                    {isFollowing ? (
-                      <UserMinus className="w-4 h-4" />
+        <LoadingWrapper loading={loading}>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Column - Profile Info */}
+            <div className="lg:col-span-1 space-y-6">
+              {/* Profile Card */}
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-6">
+                <div className="text-center">
+                  <div className="w-24 h-24 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    {/* Avatar */}
+                    {userData.avatarUrl ? (
+                      <img
+                        src={userData.avatarUrl}
+                        alt={userData.username}
+                        className="w-24 h-24 rounded-full object-cover"
+                      />
                     ) : (
-                      <UserPlus className="w-4 h-4" />
+                      <div className="w-24 h-24 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
+                        <User className="w-12 h-12 text-white" />
+                      </div>
                     )}
-                    <span>{isFollowing ? "Unfollow" : "Follow"}</span>
-                  </button>
-                )}
+                  </div>
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {userData?.username}
+                  </h2>
 
-                {!isOwnProfile && sentFollowRequest && (
-                  <button
-                    className="mt-4 px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
-                    onClick={() => cancelSentFollowRequest()}
-                  >
-                    <span>Cancel follow request</span>
-                  </button>
-                )}
+                  {/* Follow/Unfollow Button */}
+                  {!isOwnProfile && !sentFollowRequest && (
+                    <button
+                      onClick={handleFollowToggle}
+                      className={`mt-4 px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 mx-auto ${
+                        isFollowing
+                          ? "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+                          : "bg-purple-600 text-white hover:bg-purple-700"
+                      }`}
+                    >
+                      {isFollowing ? (
+                        <UserMinus className="w-4 h-4" />
+                      ) : (
+                        <UserPlus className="w-4 h-4" />
+                      )}
+                      <span>{isFollowing ? "Unfollow" : "Follow"}</span>
+                    </button>
+                  )}
 
-                <div className="flex items-center justify-center space-x-1 text-sm text-gray-500 dark:text-gray-400 mt-3">
-                  <Calendar className="w-4 h-4" />
-                  <span>Joined {new Date(userData?.createdAt).toLocaleDateString("pl-PL")}</span>
-                </div>
+                  {!isOwnProfile && sentFollowRequest && (
+                    <button
+                      className="mt-4 px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
+                      onClick={() => cancelSentFollowRequest()}
+                    >
+                      <span>Cancel follow request</span>
+                    </button>
+                  )}
 
-                {/* Profile Views (if available) */}
-                {/* {userData?.profileViewCount !== undefined && (
+                  <div className="flex items-center justify-center space-x-1 text-sm text-gray-500 dark:text-gray-400 mt-3">
+                    <Calendar className="w-4 h-4" />
+                    <span>Joined {new Date(userData?.createdAt).toLocaleDateString("pl-PL")}</span>
+                  </div>
+
+                  {/* Profile Views (if available) */}
+                  {/* {userData?.profileViewCount !== undefined && (
                   <div className="flex items-center justify-center space-x-1 text-sm text-gray-500 dark:text-gray-400 mt-2">
                     <Eye className="w-4 h-4" />
                     <span>{userData.profileViewCount} profile views</span>
                   </div>
                 )} */}
+                </div>
               </div>
-            </div>
 
-            {/* Statistics */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">Followers</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
-                    {userData?._count?.follower ?? userData?.follower?.length ?? 0}
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-orange-600">Following</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
-                    {userData?._count?.following ?? userData?.following?.length ?? 0}
-                  </div>
-                </div>
-
-                {/* Completed Challenges (only for private/public access) */}
-                {userData?._count?.ideaStatus !== undefined && (
-                  <div className="text-center col-span-2">
-                    <div className="text-2xl font-bold text-purple-600">COMPLETED CHALLENGES</div>
+              {/* Statistics */}
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600">Followers</div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">
-                      {userData._count.ideaStatus}
+                      {userData?._count?.follower ?? userData?.follower?.length ?? 0}
                     </div>
                   </div>
-                )}
-              </div>
-            </div>
-          </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-orange-600">Following</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                      {userData?._count?.following ?? userData?.following?.length ?? 0}
+                    </div>
+                  </div>
 
-          {/* Right Column - Content */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Ideas Section */}
-            {canViewIdeas && userData?.ideas && (
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h3
-                    onClick={() => setIsExpanded(!isExpanded)}
-                    className="text-xl font-semibold text-gray-900 dark:text-white flex items-center cursor-pointer select-none"
-                  >
-                    <BookOpen className="w-5 h-5 mr-2 text-purple-600" />
-                    {isOwnProfile ? "My Ideas" : `${userData.username}'s Ideas`}
-                    <ChevronDown
-                      className={`ml-2 w-4 h-4 transition-transform ${isExpanded ? "rotate-180" : ""}`}
-                    />
-                  </h3>
-                  {isOwnProfile && (
-                    <a href="/add-idea">
-                      <button className="min-w-[100px] text-center bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center space-x-2">
-                        <Plus className="w-4 h-4" />
-                        <span>Add</span>
-                      </button>
-                    </a>
+                  {/* Completed Challenges (only for private/public access) */}
+                  {userData?._count?.ideaStatus !== undefined && (
+                    <div className="text-center col-span-2">
+                      <div className="text-2xl font-bold text-purple-600">COMPLETED CHALLENGES</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
+                        {userData._count.ideaStatus}
+                      </div>
+                    </div>
                   )}
                 </div>
-                {isExpanded && (
-                  <div className="space-y-4">
-                    {userData.ideas.length === 0 ? (
-                      <p className="text-gray-500 dark:text-gray-400 text-center py-8">
-                        No ideas shared yet
-                      </p>
-                    ) : (
-                      userData.ideas.map((idea) => (
-                        <div
-                          key={idea.id}
-                          className="border dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                        >
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center space-x-2 mb-2">
-                                <h4 className="font-semibold text-gray-900 dark:text-white">
-                                  {idea.title}
-                                </h4>
-                                <span
-                                  className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                    idea.isActive === true
-                                      ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                                      : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                                  }`}
-                                >
-                                  {idea.isActive ? "Active" : "Inactive"}
-                                </span>
-                              </div>
-                              <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">
-                                {idea.description}
-                              </p>
-                              <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                                <span className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-                                  {idea.locationType}
-                                </span>
-                                <span className="flex items-center space-x-1">
-                                  <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                                  <span>{idea.averageRating}</span>
-                                </span>
-                                <span className="flex items-center space-x-1">
-                                  <ClipboardCheck className="w-4 h-4" />
-                                  <span>{idea.completionCount}</span>
-                                </span>
-                              </div>
-                            </div>
-                            {isOwnProfile && (
-                              <button
-                                onClick={() => navigate(`/edit-idea/${idea.id}`)}
-                                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                              >
-                                <Edit3 className="w-4 h-4" />
-                              </button>
-                            )}
-                            <button
-                              onClick={() => navigate(`/idea/${idea.id}`)}
-                              className="text-gray-400 ml-4 hover:text-gray-600 dark:hover:text-gray-300"
-                            >
-                              <ExternalLink className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-                      ))
+              </div>
+            </div>
+
+            {/* Right Column - Content */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Ideas Section */}
+              {canViewIdeas && userData?.ideas && (
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3
+                      onClick={() => setIsExpanded(!isExpanded)}
+                      className="text-xl font-semibold text-gray-900 dark:text-white flex items-center cursor-pointer select-none"
+                    >
+                      <BookOpen className="w-5 h-5 mr-2 text-purple-600" />
+                      {isOwnProfile ? "My Ideas" : `${userData.username}'s Ideas`}
+                      <ChevronDown
+                        className={`ml-2 w-4 h-4 transition-transform ${isExpanded ? "rotate-180" : ""}`}
+                      />
+                    </h3>
+                    {isOwnProfile && (
+                      <a href="/add-idea">
+                        <button className="min-w-[100px] text-center bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center space-x-2">
+                          <Plus className="w-4 h-4" />
+                          <span>Add</span>
+                        </button>
+                      </a>
                     )}
                   </div>
-                )}
-              </div>
-            )}
-
-            {/* Todo Section - Only for own profile */}
-            {canViewTodoAndFavorites && userData?.todoIdeas && (
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h3
-                    onClick={() => setTodoExpanded(!todoExpanded)}
-                    className="text-xl font-semibold text-gray-900 dark:text-white flex items-center cursor-pointer select-none"
-                  >
-                    <Target className="w-5 h-5 mr-2 text-orange-600" />
-                    My Todo
-                    <ChevronDown
-                      className={`ml-2 w-4 h-4 transition-transform ${todoExpanded ? "rotate-180" : ""}`}
-                    />
-                  </h3>
-                  <a href="/ideas/search">
-                    <button className=" min-w-[100px] text-center bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors flex items-center space-x-2">
-                      <Plus className="w-4 h-4" />
-                      <span>Search</span>
-                    </button>
-                  </a>
-                </div>
-                {todoExpanded && (
-                  <div className="space-y-4">
-                    {userData.todoIdeas.length === 0 ? (
-                      <p className="text-gray-500 dark:text-gray-400 text-center py-8">
-                        No todo items yet
-                      </p>
-                    ) : (
-                      userData.todoIdeas.map((idea) => (
-                        <div
-                          key={idea.id}
-                          className="border dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                        >
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center space-x-2 mb-2">
-                                <h4 className="font-semibold text-gray-900 dark:text-white">
-                                  {idea.title}
-                                </h4>
-                                <span
-                                  className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                    idea.isActive === true
-                                      ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                                      : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                                  }`}
-                                >
-                                  {idea.isActive ? "Active" : "Inactive"}
-                                </span>
+                  {isExpanded && (
+                    <div className="space-y-4">
+                      {userData.ideas.length === 0 ? (
+                        <p className="text-gray-500 dark:text-gray-400 text-center py-8">
+                          No ideas shared yet
+                        </p>
+                      ) : (
+                        userData.ideas.map((idea) => (
+                          <div
+                            key={idea.id}
+                            className="border dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                          >
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center space-x-2 mb-2">
+                                  <h4 className="font-semibold text-gray-900 dark:text-white">
+                                    {idea.title}
+                                  </h4>
+                                  <span
+                                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                      idea.isActive === true
+                                        ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                                        : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                                    }`}
+                                  >
+                                    {idea.isActive ? "Active" : "Inactive"}
+                                  </span>
+                                </div>
+                                <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">
+                                  {idea.description}
+                                </p>
+                                <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                                  <span className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                                    {idea.locationType}
+                                  </span>
+                                  <span className="flex items-center space-x-1">
+                                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                                    <span>{idea.averageRating}</span>
+                                  </span>
+                                  <span className="flex items-center space-x-1">
+                                    <ClipboardCheck className="w-4 h-4" />
+                                    <span>{idea.completionCount}</span>
+                                  </span>
+                                </div>
+                              </div>
+                              {isOwnProfile && (
                                 <button
-                                  onClick={() => navigate(`/idea/${idea.id}`)}
+                                  onClick={() => navigate(`/edit-idea/${idea.id}`)}
                                   className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                                 >
-                                  <ExternalLink className="w-4 h-4" />
+                                  <Edit3 className="w-4 h-4" />
                                 </button>
-                              </div>
-
-                              <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">
-                                {idea.description}
-                              </p>
-                              <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                                <span className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-                                  {idea.locationType}
-                                </span>
-                                <span className="flex items-center space-x-1">
-                                  <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                                  <span>{idea.averageRating}</span>
-                                </span>
-                                <span className="flex items-center space-x-1">
-                                  <ClipboardCheck className="w-4 h-4" />
-                                  <span>{idea.completionCount}</span>
-                                </span>
-                              </div>
+                              )}
+                              <button
+                                onClick={() => navigate(`/idea/${idea.id}`)}
+                                className="text-gray-400 ml-4 hover:text-gray-600 dark:hover:text-gray-300"
+                              >
+                                <ExternalLink className="w-4 h-4" />
+                              </button>
                             </div>
-                            <button
-                              onClick={() => navigate(`/idea/${idea.id}`)}
-                              className="text-gray-400 ml-4 hover:text-gray-600 dark:hover:text-gray-300"
-                            >
-                              <ExternalLink className="w-4 h-4" />
-                            </button>
                           </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Saved Ideas Section - Only for own profile */}
-            {canViewTodoAndFavorites && userData?.favoritedIdeas && (
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h3
-                    onClick={() => setSavedExpanded(!savedExpanded)}
-                    className="text-xl font-semibold text-gray-900 dark:text-white flex items-center cursor-pointer select-none"
-                  >
-                    <Heart className="w-5 h-5 mr-2 text-red-500 fill-current" />
-                    Favorites Ideas
-                    <ChevronDown
-                      className={`ml-2 w-4 h-4 transition-transform ${savedExpanded ? "rotate-180" : ""}`}
-                    />
-                  </h3>
+                        ))
+                      )}
+                    </div>
+                  )}
                 </div>
-                {savedExpanded && (
-                  <div className="space-y-4">
-                    {userData.favoritedIdeas.length === 0 ? (
-                      <p className="text-gray-500 dark:text-gray-400 text-center py-8">
-                        No saved ideas yet
-                      </p>
-                    ) : (
-                      userData.favoritedIdeas.map((idea) => (
-                        <div
-                          key={idea.id}
-                          className="border dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                        >
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center space-x-2 mb-2">
-                                <h4 className="font-semibold text-gray-900 dark:text-white">
-                                  {idea.title}
-                                </h4>
-                                <span
-                                  className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                    idea.isActive === true
-                                      ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                                      : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                                  }`}
-                                >
-                                  {idea.isActive ? "Active" : "Inactive"}
-                                </span>
-                              </div>
-                              <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">
-                                {idea.description}
-                              </p>
-                              <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                                <span className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-                                  {idea.locationType}
-                                </span>
-                                <span className="flex items-center space-x-1">
-                                  <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                                  <span>{idea.averageRating}</span>
-                                </span>
-                                <span className="flex items-center space-x-1">
-                                  <ClipboardCheck className="w-4 h-4" />
-                                  <span>{idea.completionCount}</span>
-                                </span>
-                              </div>
-                            </div>
-                            <button
-                              onClick={() => navigate(`/idea/${idea.id}`)}
-                              className="text-gray-400 ml-4 hover:text-gray-600 dark:hover:text-gray-300"
-                            >
-                              <ExternalLink className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
+              )}
 
-            {/* Limited Access Message */}
-            {!canViewIdeas && (
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-6 text-center">
-                <Lock className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                  Limited Profile Access
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  Follow {userData.username} to see their ideas and activity
-                </p>
-                <button
-                  onClick={handleFollowToggle}
-                  className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center space-x-2 mx-auto"
-                >
-                  <UserPlus className="w-4 h-4" />
-                  <span>Follow</span>
-                </button>
-              </div>
-            )}
+              {/* Todo Section - Only for own profile */}
+              {canViewTodoAndFavorites && userData?.todoIdeas && (
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3
+                      onClick={() => setTodoExpanded(!todoExpanded)}
+                      className="text-xl font-semibold text-gray-900 dark:text-white flex items-center cursor-pointer select-none"
+                    >
+                      <Target className="w-5 h-5 mr-2 text-orange-600" />
+                      My Todo
+                      <ChevronDown
+                        className={`ml-2 w-4 h-4 transition-transform ${todoExpanded ? "rotate-180" : ""}`}
+                      />
+                    </h3>
+                    <a href="/ideas/search">
+                      <button className=" min-w-[100px] text-center bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors flex items-center space-x-2">
+                        <Plus className="w-4 h-4" />
+                        <span>Search</span>
+                      </button>
+                    </a>
+                  </div>
+                  {todoExpanded && (
+                    <div className="space-y-4">
+                      {userData.todoIdeas.length === 0 ? (
+                        <p className="text-gray-500 dark:text-gray-400 text-center py-8">
+                          No todo items yet
+                        </p>
+                      ) : (
+                        userData.todoIdeas.map((idea) => (
+                          <div
+                            key={idea.id}
+                            className="border dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                          >
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center space-x-2 mb-2">
+                                  <h4 className="font-semibold text-gray-900 dark:text-white">
+                                    {idea.title}
+                                  </h4>
+                                  <span
+                                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                      idea.isActive === true
+                                        ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                                        : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                                    }`}
+                                  >
+                                    {idea.isActive ? "Active" : "Inactive"}
+                                  </span>
+                                  <button
+                                    onClick={() => navigate(`/idea/${idea.id}`)}
+                                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                  >
+                                    <ExternalLink className="w-4 h-4" />
+                                  </button>
+                                </div>
+
+                                <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">
+                                  {idea.description}
+                                </p>
+                                <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                                  <span className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                                    {idea.locationType}
+                                  </span>
+                                  <span className="flex items-center space-x-1">
+                                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                                    <span>{idea.averageRating}</span>
+                                  </span>
+                                  <span className="flex items-center space-x-1">
+                                    <ClipboardCheck className="w-4 h-4" />
+                                    <span>{idea.completionCount}</span>
+                                  </span>
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => navigate(`/idea/${idea.id}`)}
+                                className="text-gray-400 ml-4 hover:text-gray-600 dark:hover:text-gray-300"
+                              >
+                                <ExternalLink className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Saved Ideas Section - Only for own profile */}
+              {canViewTodoAndFavorites && userData?.favoritedIdeas && (
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3
+                      onClick={() => setSavedExpanded(!savedExpanded)}
+                      className="text-xl font-semibold text-gray-900 dark:text-white flex items-center cursor-pointer select-none"
+                    >
+                      <Heart className="w-5 h-5 mr-2 text-red-500 fill-current" />
+                      Favorites Ideas
+                      <ChevronDown
+                        className={`ml-2 w-4 h-4 transition-transform ${savedExpanded ? "rotate-180" : ""}`}
+                      />
+                    </h3>
+                  </div>
+                  {savedExpanded && (
+                    <div className="space-y-4">
+                      {userData.favoritedIdeas.length === 0 ? (
+                        <p className="text-gray-500 dark:text-gray-400 text-center py-8">
+                          No saved ideas yet
+                        </p>
+                      ) : (
+                        userData.favoritedIdeas.map((idea) => (
+                          <div
+                            key={idea.id}
+                            className="border dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                          >
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center space-x-2 mb-2">
+                                  <h4 className="font-semibold text-gray-900 dark:text-white">
+                                    {idea.title}
+                                  </h4>
+                                  <span
+                                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                      idea.isActive === true
+                                        ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                                        : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                                    }`}
+                                  >
+                                    {idea.isActive ? "Active" : "Inactive"}
+                                  </span>
+                                </div>
+                                <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">
+                                  {idea.description}
+                                </p>
+                                <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                                  <span className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                                    {idea.locationType}
+                                  </span>
+                                  <span className="flex items-center space-x-1">
+                                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                                    <span>{idea.averageRating}</span>
+                                  </span>
+                                  <span className="flex items-center space-x-1">
+                                    <ClipboardCheck className="w-4 h-4" />
+                                    <span>{idea.completionCount}</span>
+                                  </span>
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => navigate(`/idea/${idea.id}`)}
+                                className="text-gray-400 ml-4 hover:text-gray-600 dark:hover:text-gray-300"
+                              >
+                                <ExternalLink className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Limited Access Message */}
+              {!canViewIdeas && (
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-6 text-center">
+                  <Lock className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    Limited Profile Access
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">
+                    Follow {userData.username} to see their ideas and activity
+                  </p>
+                  <button
+                    onClick={handleFollowToggle}
+                    className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center space-x-2 mx-auto"
+                  >
+                    <UserPlus className="w-4 h-4" />
+                    <span>Follow</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        </LoadingWrapper>
       </div>
       <Footer />
     </div>

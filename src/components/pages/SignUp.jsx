@@ -43,33 +43,39 @@ export default function SignUp() {
   const validateEmail = () => {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (registerData.email && !emailPattern.test(registerData.email)) {
-      setError({ ...error, email: "Invalid email format" });
+      setError((prev) => ({ ...prev, email: "Invalid email format" }));
       return false;
     }
-    setError({ ...error, email: "" });
+    setError((prev) => ({ ...prev, email: "" }));
     return true;
   };
 
-  const validatePassword = (password, confirm) => {
-    validateConfirmPassword(password, confirm);
+  const validatePassword = () => {
     if (registerData.password.length < 8) {
-      setError({ ...error, password: "Password must be at least 8 characters" });
+      setError((prev) => ({ ...prev, password: "Password must be at least 8 characters" }));
       return false;
     } else if (!/[A-Z]/.test(registerData.password)) {
-      setError({ ...error, password: "Password must contain at least one uppercase letter" });
+      setError((prev) => ({
+        ...prev,
+        password: "Password must contain at least one uppercase letter",
+      }));
       return false;
     } else if (!/[0-9]/.test(registerData.password)) {
-      setError({ ...error, password: "Password must contain at least one number" });
+      setError((prev) => ({ ...prev, password: "Password must contain at least one number" }));
       return false;
     }
-    setError({ ...error, password: "" });
+    setError((prev) => ({ ...prev, password: "" }));
     return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (validateEmail() && validatePassword() && validateConfirmPassword()) {
+    const isEmailValid = validateEmail();
+    const isPasswordValid = validatePassword();
+    const isConfirmPasswordValid = validateConfirmPassword(registerData.password, confirmPassword);
+
+    if (isEmailValid && isPasswordValid && isConfirmPasswordValid) {
       // If all validations pass, proceed with form submission
       try {
         const res = await fetch(`${apiUrl}/auth/register`, {
@@ -88,19 +94,24 @@ export default function SignUp() {
             };
             return newError;
           });
+        } else {
+          setBackendData(data);
+          alert("Account created successfully!");
+          navigate("/login");
         }
-
-        setBackendData(data);
-        alert("Account created successfully!");
-        navigate("/login");
       } catch (error) {
         console.error(error);
+        setError((prev) => ({
+          ...prev,
+          sendData: "An error occurred. Please try again.",
+        }));
       }
     } else {
-      setError({
-        ...error,
-        sendData: "Please fill in all fields correctly:",
-      });
+      // Clear the general error message since specific errors are already shown
+      setError((prev) => ({
+        ...prev,
+        sendData: "",
+      }));
     }
   };
 
@@ -215,7 +226,7 @@ export default function SignUp() {
                 value={registerData.username}
                 onChange={(e) => {
                   setRegisterData({ ...registerData, username: e.target.value });
-                  setError({ ...error, username: "" });
+                  setError((prev) => ({ ...prev, username: "" }));
                 }}
               />
             </div>
@@ -259,8 +270,7 @@ export default function SignUp() {
                 value={registerData.email}
                 onChange={(e) => {
                   setRegisterData({ ...registerData, email: e.target.value });
-                  validateEmail();
-                  setError({ ...error, email: "" });
+                  setError((prev) => ({ ...prev, email: "" }));
                 }}
               />
             </div>
@@ -301,10 +311,13 @@ export default function SignUp() {
                 }`}
                 placeholder="minimum 8 characters"
                 value={registerData.password}
-                onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
-                onBlur={(e) => {
-                  const value = e.target.value;
-                  validateConfirmPassword(value, confirmPassword);
+                onChange={(e) => {
+                  setRegisterData({ ...registerData, password: e.target.value });
+                  setError((prev) => ({ ...prev, password: "" }));
+                }}
+                onBlur={() => {
+                  validatePassword();
+                  validateConfirmPassword(registerData.password, confirmPassword);
                 }}
               />
               <button
@@ -363,6 +376,7 @@ export default function SignUp() {
                 value={confirmPassword}
                 onChange={(e) => {
                   setConfirmPassword(e.target.value);
+                  setError((prev) => ({ ...prev, confirmPassword: "" }));
                 }}
                 onBlur={(e) => validateConfirmPassword(registerData.password, e.target.value)}
               />

@@ -11,7 +11,7 @@ export default function PendingFollowRequests({ isExpanded, setIsExpanded }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [processingIds, setProcessingIds] = useState(new Set());
-  const { refreshTrigger } = useSocialContext();
+  const { refreshTrigger, triggerRefresh } = useSocialContext();
 
   useEffect(() => {
     const fetchFollowingRequests = async () => {
@@ -59,6 +59,7 @@ export default function PendingFollowRequests({ isExpanded, setIsExpanded }) {
         copy.delete(requestId);
         return copy;
       });
+      triggerRefresh();
     }
   };
 
@@ -84,6 +85,7 @@ export default function PendingFollowRequests({ isExpanded, setIsExpanded }) {
         copy.delete(requestId);
         return copy;
       });
+      triggerRefresh();
     }
   };
 

@@ -6,10 +6,9 @@ import { apiUrl } from "../../utils/api";
 import { Filter, X, ChevronLeft, ChevronRight, Award } from "lucide-react";
 import AuthContext from "../auth/AuthContext.jsx";
 import { LoadingWrapper } from "../common/index.js";
-import { del } from "framer-motion/client";
 
 export default function SearchIdeas() {
-  const { labels } = useContext(AuthContext);
+  const { labels, fetchLabels } = useContext(AuthContext);
   const [filters, setFilters] = useState({});
   const [ideas, setIdeas] = useState([]);
 
@@ -27,7 +26,20 @@ export default function SearchIdeas() {
   const [totalCount, setTotalCount] = useState(0);
 
   const [loading, setLoading] = useState(true);
+  const [filtersLoading, setFiltersLoading] = useState(true);
 
+  useEffect(() => {
+    const fetchLabelsAgain = async () => {
+      try {
+        await fetchLabels();
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setFiltersLoading(false);
+      }
+    };
+    fetchLabelsAgain();
+  }, []);
   // useEffect(() => {
   //   // Fetch hardcoded labels
   //   // const fetchFilters = async () => {
@@ -171,215 +183,217 @@ export default function SearchIdeas() {
           <div className="flex flex-col lg:flex-row gap-6">
             {/* Sidebar - Filters */}
 
-            <div className="lg:w-80 lg:flex-shrink-0">
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700">
-                {/* Filter header */}
-                <div className="flex items-center justify-between p-4 border-b dark:border-gray-700">
-                  <div className="flex items-center space-x-3">
-                    <Filter className="w-5 h-5 text-purple-600" />
-                    <h3 className="font-semibold text-gray-900 dark:text-white">Filters</h3>
+            <LoadingWrapper loading={filtersLoading} page={false}>
+              <div className="lg:w-80 lg:flex-shrink-0">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700">
+                  {/* Filter header */}
+                  <div className="flex items-center justify-between p-4 border-b dark:border-gray-700">
+                    <div className="flex items-center space-x-3">
+                      <Filter className="w-5 h-5 text-purple-600" />
+                      <h3 className="font-semibold text-gray-900 dark:text-white">Filters</h3>
+                      {activeFiltersCount > 0 && (
+                        <span className="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-xs font-medium px-2 py-1 rounded-full">
+                          {activeFiltersCount}
+                        </span>
+                      )}
+                    </div>
                     {activeFiltersCount > 0 && (
-                      <span className="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-xs font-medium px-2 py-1 rounded-full">
-                        {activeFiltersCount}
-                      </span>
+                      <button
+                        onClick={clearAllFilters}
+                        className="text-red-500 hover:text-red-700 text-sm font-medium px-2 py-1 rounded hover:bg-red-50 dark:hover:bg-red-900 transition-colors"
+                      >
+                        Clear All
+                      </button>
                     )}
                   </div>
-                  {activeFiltersCount > 0 && (
-                    <button
-                      onClick={clearAllFilters}
-                      className="text-red-500 hover:text-red-700 text-sm font-medium px-2 py-1 rounded hover:bg-red-50 dark:hover:bg-red-900 transition-colors"
-                    >
-                      Clear All
-                    </button>
-                  )}
-                </div>
 
-                {/* Filter content */}
-                <div className="p-4 space-y-4">
-                  {/* Search */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Search by title
-                    </label>
-                    <input
-                      type="text"
-                      value={filters.title || ""}
-                      onChange={(e) => updateFilter("title", e.target.value)}
-                      placeholder="Enter title..."
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                    />
-                  </div>
-
-                  {/* Categories */}
-                  {labels.categories.length > 0 && (
+                  {/* Filter content */}
+                  <div className="p-4 space-y-4">
+                    {/* Search */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Categories
+                        Search by title
                       </label>
-                      <select
-                        value={filters.categoryIds || ""}
-                        onChange={(e) => updateFilter("categoryIds", e.target.value)}
+                      <input
+                        type="text"
+                        value={filters.title || ""}
+                        onChange={(e) => updateFilter("title", e.target.value)}
+                        placeholder="Enter title..."
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                      >
-                        <option value="">All categories</option>
-                        {labels.categories.map((cat) => (
-                          <option key={cat.id} value={cat.id}>
-                            {cat.label}
-                          </option>
-                        ))}
-                      </select>
+                      />
                     </div>
-                  )}
 
-                  {/* Location */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Location
-                    </label>
-                    <select
-                      value={filters.location_type || ""}
-                      onChange={(e) => updateFilter("location_type", e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                    >
-                      <option value="">All locations</option>
-                      {labels.locationTypes.map((type) => (
-                        <option key={type.value} value={type.value}>
-                          {type.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Duration */}
-                  {labels.durations.length > 0 && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Duration
-                      </label>
-                      <select
-                        value={filters.duration || ""}
-                        onChange={(e) => updateFilter("duration", e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                      >
-                        <option value="">Any duration</option>
-                        {labels.durations.map((duration) => (
-                          <option key={duration.id} value={duration.id}>
-                            {duration.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-
-                  {/* Price Range */}
-                  {labels.priceRanges.length > 0 && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Price Range
-                      </label>
-                      <select
-                        value={filters.price || ""}
-                        onChange={(e) => updateFilter("price", e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                      >
-                        <option value="">Any price</option>
-                        {labels.priceRanges.map((price) => (
-                          <option key={price.id} value={price.id}>
-                            {price.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-
-                  {/* Group Size */}
-                  {labels.groups.length > 0 && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Group Size
-                      </label>
-                      <select
-                        value={filters.groupIds || ""}
-                        onChange={(e) => updateFilter("groupIds", e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                      >
-                        <option value="">Any size</option>
-                        {labels.groups.map((group) => (
-                          <option key={group.id} value={group.id}>
-                            {group.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-
-                  {/* Status */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Status
-                    </label>
-                    <select
-                      value={filters.status || ""}
-                      onChange={(e) => updateFilter("status", e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                    >
-                      <option value="">All statuses</option>
-                      {labels.statusTypes.map((status) => (
-                        <option key={status.value} value={status.value}>
-                          {status.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Challenge Toggle */}
-                  <div className="flex items-center space-x-3 pt-2">
-                    <input
-                      type="checkbox"
-                      id="challenge"
-                      checked={filters.challenge === "true"}
-                      onChange={(e) => updateFilter("challenge", e.target.checked ? "true" : "")}
-                      className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 dark:focus:ring-purple-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                    />
-                    <label
-                      htmlFor="challenge"
-                      className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300"
-                    >
-                      <Award className="w-4 h-4 mr-1 text-yellow-500" />
-                      Challenges only
-                    </label>
-                  </div>
-
-                  {/* Active Filters */}
-                  {activeFiltersCount > 0 && (
-                    <div className="pt-4 border-t dark:border-gray-700">
-                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                        Active filters:
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
-                        {Object.entries(filters).map(
-                          ([key, value]) =>
-                            value && (
-                              <span
-                                key={key}
-                                className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200"
-                              >
-                                {key}: {value}
-                                <button
-                                  onClick={() => clearFilter(key)}
-                                  className="ml-1 hover:text-purple-600 dark:hover:text-purple-400"
-                                >
-                                  <X className="w-3 h-3" />
-                                </button>
-                              </span>
-                            )
-                        )}
+                    {/* Categories */}
+                    {labels.categories.length > 0 && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          Categories
+                        </label>
+                        <select
+                          value={filters.categoryIds || ""}
+                          onChange={(e) => updateFilter("categoryIds", e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                        >
+                          <option value="">All categories</option>
+                          {labels.categories.map((cat) => (
+                            <option key={cat.id} value={cat.id}>
+                              {cat.label}
+                            </option>
+                          ))}
+                        </select>
                       </div>
+                    )}
+
+                    {/* Location */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Location
+                      </label>
+                      <select
+                        value={filters.location_type || ""}
+                        onChange={(e) => updateFilter("location_type", e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                      >
+                        <option value="">All locations</option>
+                        {labels.locationTypes.map((type) => (
+                          <option key={type.value} value={type.value}>
+                            {type.label}
+                          </option>
+                        ))}
+                      </select>
                     </div>
-                  )}
+
+                    {/* Duration */}
+                    {labels.durations.length > 0 && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          Duration
+                        </label>
+                        <select
+                          value={filters.duration || ""}
+                          onChange={(e) => updateFilter("duration", e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                        >
+                          <option value="">Any duration</option>
+                          {labels.durations.map((duration) => (
+                            <option key={duration.id} value={duration.id}>
+                              {duration.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    {/* Price Range */}
+                    {labels.priceRanges.length > 0 && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          Price Range
+                        </label>
+                        <select
+                          value={filters.price || ""}
+                          onChange={(e) => updateFilter("price", e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                        >
+                          <option value="">Any price</option>
+                          {labels.priceRanges.map((price) => (
+                            <option key={price.id} value={price.id}>
+                              {price.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    {/* Group Size */}
+                    {labels.groups.length > 0 && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          Group Size
+                        </label>
+                        <select
+                          value={filters.groupIds || ""}
+                          onChange={(e) => updateFilter("groupIds", e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                        >
+                          <option value="">Any size</option>
+                          {labels.groups.map((group) => (
+                            <option key={group.id} value={group.id}>
+                              {group.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    {/* Status */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Status
+                      </label>
+                      <select
+                        value={filters.status || ""}
+                        onChange={(e) => updateFilter("status", e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                      >
+                        <option value="">All statuses</option>
+                        {labels.statusTypes.map((status) => (
+                          <option key={status.value} value={status.value}>
+                            {status.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Challenge Toggle */}
+                    <div className="flex items-center space-x-3 pt-2">
+                      <input
+                        type="checkbox"
+                        id="challenge"
+                        checked={filters.challenge === "true"}
+                        onChange={(e) => updateFilter("challenge", e.target.checked ? "true" : "")}
+                        className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 dark:focus:ring-purple-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                      />
+                      <label
+                        htmlFor="challenge"
+                        className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300"
+                      >
+                        <Award className="w-4 h-4 mr-1 text-yellow-500" />
+                        Challenges only
+                      </label>
+                    </div>
+
+                    {/* Active Filters */}
+                    {activeFiltersCount > 0 && (
+                      <div className="pt-4 border-t dark:border-gray-700">
+                        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                          Active filters:
+                        </h4>
+                        <div className="flex flex-wrap gap-2">
+                          {Object.entries(filters).map(
+                            ([key, value]) =>
+                              value && (
+                                <span
+                                  key={key}
+                                  className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200"
+                                >
+                                  {key}: {value}
+                                  <button
+                                    onClick={() => clearFilter(key)}
+                                    className="ml-1 hover:text-purple-600 dark:hover:text-purple-400"
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </button>
+                                </span>
+                              )
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
+            </LoadingWrapper>
 
             {/* Main content - Ideas list */}
             <div className="flex-1 min-w-0">

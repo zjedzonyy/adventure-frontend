@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useContext, useState } from "react";
 
 import { AuthContext } from "../auth/index.js";
-import { UserSearchBar } from "../common/index.js";
+import { UserSearchBar, LoadingWrapper } from "../common/index.js";
 
 import { Compass, User, Sun, Moon, Menu, X } from "lucide-react";
 
@@ -12,14 +12,18 @@ export default function Navbar() {
     useContext(AuthContext);
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleLogout = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       await logout();
       navigate("/login");
     } catch (error) {
       console.error("Logout failed:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -104,12 +108,14 @@ export default function Navbar() {
                     >
                       Settings
                     </NavLink>
-                    <button
-                      onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900"
-                    >
-                      Log Out
-                    </button>
+                    <LoadingWrapper loading={loading} page={false}>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900"
+                      >
+                        Log Out
+                      </button>
+                    </LoadingWrapper>
                   </>
                 ) : (
                   <>
@@ -189,12 +195,14 @@ export default function Navbar() {
                     >
                       Settings
                     </NavLink>
-                    <button
-                      onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900"
-                    >
-                      Log Out
-                    </button>
+                    <LoadingWrapper loading={loading} page={false} size="small">
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900"
+                      >
+                        Log Out
+                      </button>
+                    </LoadingWrapper>
                   </>
                 ) : (
                   <>

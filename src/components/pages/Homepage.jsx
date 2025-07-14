@@ -14,10 +14,6 @@ export default function Homepage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
-  function delay(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-
   const handleRandomIdea = async () => {
     if (!user) {
       const luckyNumber = Math.floor(Math.random() * 50);
@@ -64,7 +60,6 @@ export default function Homepage() {
       } catch (err) {
         console.error(err);
       } finally {
-        await delay(5000);
         setLoading(false);
       }
     };
@@ -154,7 +149,7 @@ export default function Homepage() {
           <LoadingWrapper loading={loading} page={false}>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {sampleIdeas?.map((idea) => (
-                <IdeaCard idea={idea}></IdeaCard>
+                <IdeaCard idea={idea} key={idea.id}></IdeaCard>
               ))}
             </div>
           </LoadingWrapper>

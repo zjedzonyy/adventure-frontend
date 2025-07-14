@@ -25,10 +25,11 @@ export default function Comments({
   handleAddComment,
   handleLikeComment,
   commentsCount,
-  setClicked,
   setCommentSortChange,
   commentSort,
   setCommentSort,
+  setComments,
+  setPagination,
 }) {
   const { user, avatarUrl } = useContext(AuthContext);
   const [editedCommentId, setEditedCommentId] = useState(null);
@@ -52,8 +53,19 @@ export default function Comments({
         headers: { "Content-Type": "application/json" },
         credentials: "include",
       });
+
       if (!res.ok) throw new Error("Failed to delete comment");
-      setClicked();
+
+      // Delete from state
+      setComments((prevComments) => prevComments.filter((comment) => comment.id !== commentId));
+
+      // Change Comments Counter
+      setPagination((prevPagination) => ({
+        ...prevPagination,
+        totalItems: (prevPagination?.totalItems || 0) - 1,
+      }));
+
+      console.log("Comment deleted successfully");
     } catch (error) {
       console.error("Error deleting comment:", error);
     }
@@ -67,10 +79,21 @@ export default function Comments({
         credentials: "include",
         body: JSON.stringify({ description: editedContent }),
       });
+
       if (!res.ok) throw new Error("Failed to edit comment");
-      setClicked();
+
+      // Update local state
+      setComments((prevComments) =>
+        prevComments.map((comment) =>
+          comment.id === commentId ? { ...comment, description: editedContent } : comment
+        )
+      );
+
+      // Reset state
       setEditedCommentId(null);
       setEditedContent("");
+
+      console.log("Comment edited successfully");
     } catch (error) {
       console.error("Error editing comment:", error);
     }

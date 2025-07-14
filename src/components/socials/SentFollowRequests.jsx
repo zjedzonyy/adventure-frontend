@@ -11,7 +11,7 @@ export default function SentFollowRequests({ isExpanded, setIsExpanded }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [processingIds, setProcessingIds] = useState(new Set());
-  const { refreshTrigger } = useSocialContext();
+  const { refreshTrigger, triggerRefresh } = useSocialContext();
 
   useEffect(() => {
     const fetchrequests = async () => {
@@ -27,6 +27,7 @@ export default function SentFollowRequests({ isExpanded, setIsExpanded }) {
         const data = await response.json();
         if (response.ok) {
           setRequests(data.data);
+          console.log("Takie dostaje w request: ", data.data);
         }
       } catch (err) {
         setError(err.message);
@@ -37,17 +38,17 @@ export default function SentFollowRequests({ isExpanded, setIsExpanded }) {
     fetchrequests();
   }, [refreshTrigger]);
 
-  const onCancel = async (requestId) => {
-    setProcessingIds((prev) => new Set(prev).add(requestId));
+  const onCancel = async (userId) => {
+    setProcessingIds((prev) => new Set(prev).add(userId));
     try {
-      const response = await fetch(`${apiUrl}/follow-requests/sent/${requestId}`, {
+      const response = await fetch(`${apiUrl}/follow-requests/sent/${userId}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
       });
       const data = await response.json();
       if (data.success) {
-        setRequests((prev) => prev.filter((request) => request.id !== requestId));
+        setRequests((prev) => prev.filter((request) => request.userId !== userId));
       } else {
         throw new Error(data.message || "Failed to reject follow request");
       }
@@ -56,9 +57,10 @@ export default function SentFollowRequests({ isExpanded, setIsExpanded }) {
     } finally {
       setProcessingIds((prev) => {
         const copy = new Set(prev);
-        copy.delete(requestId);
+        copy.delete(userId);
         return copy;
       });
+      triggerRefresh();
     }
   };
 
@@ -80,7 +82,7 @@ export default function SentFollowRequests({ isExpanded, setIsExpanded }) {
             <FollowRequestItem
               key={request.id}
               username={request.toUsername}
-              id={request.id}
+              id={request.toUserId}
               onReject={onCancel}
               isProcessing={processingIds.has(request.id)}
             />

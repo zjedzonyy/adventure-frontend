@@ -16,7 +16,7 @@ export default function Followers({ isExpanded, setIsExpanded }) {
   const [error, setError] = useState(null);
   const [processingIds, setProcessingIds] = useState(new Set());
   const userIdFixed = userId ? userId : user.id;
-  const { refreshTrigger } = useSocialContext();
+  const { refreshTrigger, triggerRefresh } = useSocialContext();
 
   // Fetch followers
   useEffect(() => {
@@ -66,6 +66,7 @@ export default function Followers({ isExpanded, setIsExpanded }) {
         copy.delete(followerId);
         return copy;
       });
+      triggerRefresh();
     }
   };
 

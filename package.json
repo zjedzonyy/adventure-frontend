@@ -16,6 +16,8 @@
     "framer-motion": "^12.19.2",
     "lucide-react": "^0.511.0",
     "modern-normalize": "^3.0.1",
+    "primereact": "^10.9.6",
+    "quill": "^2.0.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-loading-indicators": "^1.0.1",

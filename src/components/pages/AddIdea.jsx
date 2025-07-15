@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, use } from "react";
 import { useNavigate } from "react-router-dom";
-import MDEditor from "@uiw/react-md-editor";
+import { Editor } from "primereact/editor";
 
 import { AuthContext } from "../auth/index.js";
 import { Navbar, Footer } from "../layout/index.js";
@@ -289,13 +289,10 @@ export default function AddIdea() {
               <div
                 className={`rounded-lg ${errors.detailedDescription ? "ring-2 ring-red-400" : ""}`}
               >
-                <MDEditor
+                <Editor
                   value={formData.detailedDescription}
-                  onChange={(val) => handleInputChange("detailedDescription", val || "")}
-                  preview="edit"
-                  hideToolbar={false}
-                  visibleDragBar={false}
-                  height={200}
+                  onTextChange={(e) => handleInputChange("detailedDescription", e.htmlValue || "")}
+                  style={{ height: "320px" }}
                   data-color-mode={
                     document.documentElement.classList.contains("dark") ? "dark" : "light"
                   }

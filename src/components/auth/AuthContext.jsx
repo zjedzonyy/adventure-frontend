@@ -86,7 +86,8 @@ export function AuthProvider({ children }) {
   const fetchAndCacheAvatar = useCallback(async (avatarUrl, userId) => {
     try {
       setAvatarLoading(true);
-      const response = await fetch(avatarUrl);
+      const urlWithTimestamp = `${avatarUrl}?t=${Date.now()}`; // Prevent caching issues
+      const response = await fetch(urlWithTimestamp);
 
       if (!response.ok) {
         console.error("Avatar fetch failed:", response.status, response.statusText);
@@ -100,6 +101,11 @@ export function AuthProvider({ children }) {
       }
 
       const blob = await response.blob();
+      if (blob.type && !blob.type.startsWith("image/")) {
+        console.error("Blob is not an image:", blob.type);
+        return null;
+      }
+
       const objectUrl = URL.createObjectURL(blob);
 
       // Cache in localStorage
@@ -118,6 +124,22 @@ export function AuthProvider({ children }) {
       setAvatarLoading(false);
     }
   }, []);
+
+  const clearAvatar = useCallback(() => {
+    if (!user?.id) return;
+
+    // Clear cache
+    localStorage.removeItem(`avatar_${user.id}`);
+    localStorage.removeItem(`avatar_${user.id}_timestamp`);
+
+    // Clear state
+    setAvatarUrl(null);
+
+    // Clean up any existing object URLs to prevent memory leaks
+    if (avatarUrl && avatarUrl.startsWith("blob:")) {
+      URL.revokeObjectURL(avatarUrl);
+    }
+  }, [user?.id, avatarUrl]);
 
   const loadAvatar = useCallback(
     async (userData) => {
@@ -146,10 +168,17 @@ export function AuthProvider({ children }) {
       localStorage.removeItem(`avatar_${user.id}`);
       localStorage.removeItem(`avatar_${user.id}_timestamp`);
 
+      if (!newAvatarUrl) {
+        setAvatarUrl(null);
+        return;
+      }
+
       // Load new avatar
       const avatarBlob = await fetchAndCacheAvatar(newAvatarUrl, user.id);
       if (avatarBlob) {
         setAvatarUrl(avatarBlob);
+      } else {
+        setAvatarUrl(null);
       }
     },
     [user?.id, fetchAndCacheAvatar]
@@ -343,6 +372,7 @@ export function AuthProvider({ children }) {
     avatarUrl,
     avatarLoading,
     updateAvatar,
+    clearAvatar,
 
     // Labels
     labels,

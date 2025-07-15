@@ -6,6 +6,7 @@ import { Navbar, Footer, MainBackground } from "../layout/index.js";
 import { Comments, IdeaDetailsProvider } from "../ideas/index.js";
 import { StarRating } from "../ui/index.js";
 import { apiUrl } from "../../utils/index.js";
+import { Editor } from "primereact/editor";
 
 import {
   Heart,
@@ -51,6 +52,9 @@ export default function Idea() {
   const [commentsLoading, setCommentsLoading] = useState(true);
   const [ratingLoading, setRatingLoading] = useState(true);
 
+  function delay(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
   // Fetch idea data
   useEffect(() => {
     const fetchIdeaData = async () => {
@@ -257,7 +261,7 @@ export default function Idea() {
         <div className="min-h-screen">
           {/* Main Idea Content - Full Width */}
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <LoadingWrapper loading={isLoading} page={false}>
+            <LoadingWrapper loading={isLoading} page={true} loadingText="Loading idea...">
               {!ideaData ? (
                 <div className="flex items-center justify-center h-64 text-gray-600 dark:text-text_secondary">
                   Idea not found
@@ -366,7 +370,7 @@ export default function Idea() {
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center space-x-6 w-full sm:w-auto">
+                    <div className="flex flex-col space-y-2 sm:flex-wrap sm:flex-row sm:items-center  sm:space-x-6 w-full sm:w-auto">
                       <div className="flex items-center space-x-1 text-gray-500 dark:text-gray-400">
                         <Eye className="w-5 h-5" />
                         <span className="font-medium">{ideaData.viewCount}</span>
@@ -380,7 +384,7 @@ export default function Idea() {
                       <div className="flex items-center space-x-3">
                         <button
                           onClick={() => alert("Share functionality not implemented yet")}
-                          className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900 rounded-lg transition-colors"
+                          className="sm:p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900 rounded-lg transition-colors"
                         >
                           <Share2 className="w-5 h-5" />
                         </button>
@@ -448,7 +452,7 @@ export default function Idea() {
                       </div>
                     </div>
 
-                    <div className="flex flex-col items-center sm:space-x-4 gap-2">
+                    <div className="flex flex-col items-center sm:space-x-4 gap-2 text-text_secondary dark:text-text_primary">
                       <select
                         value={userStatus || ""}
                         onChange={(e) => handleStatusChange(e.target.value)}
@@ -479,12 +483,10 @@ export default function Idea() {
                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
                       Step-by-step Instructions
                     </h2>
-                    <div className="prose prose-lg dark:prose-invert max-w-none">
-                      <MDEditor.Markdown
-                        source={ideaData.detailedDescription}
-                        style={{ whiteSpace: "pre-wrap" }}
-                      />
-                    </div>
+                    <div
+                      dangerouslySetInnerHTML={{ __html: ideaData.detailedDescription }}
+                      className="prose dark:prose-invert text-text_secondary dark:text-text_primary"
+                    ></div>
                   </div>
                 </div>
               )}
@@ -492,7 +494,7 @@ export default function Idea() {
           </div>
 
           {/* Comments Section - Full Width, Centered */}
-          <LoadingWrapper loading={commentsLoading} page={false}>
+          <LoadingWrapper loading={commentsLoading} page={false} loadingText="Loading comments...">
             <Comments
               comments={comments}
               currentPage={pagination?.currentPage}

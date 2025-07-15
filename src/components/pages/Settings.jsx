@@ -12,12 +12,11 @@ import { apiUrl } from "../../utils/index.js";
 import { SocialProvider } from "../socials/SocialContext.jsx";
 
 export default function Settings() {
-  const { setAvatarChanged, avatarUrl, updateAvatar } = useContext(AuthContext);
+  const { avatarUrl, updateAvatar, clearAvatar } = useContext(AuthContext);
   const [file, setFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [message, setMessage] = useState("");
-
   // State for dropdowns
   const [isExpanded, setIsExpanded] = useState(false);
   const [sentIsExpanded, setSentIsExpanded] = useState(false);
@@ -27,6 +26,20 @@ export default function Settings() {
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
     setMessage("");
+    validateFileSize(e.target.files[0]);
+    validateFileType(e.target.files[0]);
+  };
+
+  const validateFileType = (file) => {
+    const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+    validTypes.includes(file.type) ||
+      setMessage("Error: Invalid file type. Please upload a JPEG/JPG/PNG image.");
+  };
+
+  const validateFileSize = (file) => {
+    const maxSize = 5 * 1024 * 1024; // 10 MB
+    file.size <= maxSize ||
+      setMessage("Error: File size exceeds 5MB. Please upload a smaller image.");
   };
 
   const handleUpload = async () => {
@@ -48,9 +61,12 @@ export default function Settings() {
       if (!res.ok) throw new Error("Couldn't upload");
 
       const data = await res.json();
-      setMessage(data.message || "Avatar updated successfully!");
-      setFile(null);
-      setAvatarChanged((prev) => !prev);
+      if (data.success) {
+        console.log("Avatar updated:", data);
+        setMessage(data.message || "Avatar updated successfully!");
+        setFile(null);
+        await updateAvatar(data.data);
+      }
 
       // Reset file input
       document.getElementById("avatar-upload").value = "";
@@ -72,8 +88,10 @@ export default function Settings() {
       if (!res.ok) throw new Error("Couldn't delete");
 
       const data = await res.json();
-      setMessage(data.message || "Avatar deleted successfully!");
-      updateAvatar();
+      if (data.success) {
+        setMessage(data.message || "Avatar deleted successfully!");
+        clearAvatar();
+      }
     } catch (err) {
       setMessage("Error: " + err.message);
     } finally {

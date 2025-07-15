@@ -40,28 +40,6 @@ export default function SearchIdeas() {
     };
     fetchLabelsAgain();
   }, []);
-  // useEffect(() => {
-  //   // Fetch hardcoded labels
-  //   // const fetchFilters = async () => {
-  //   //   try {
-  //   //     const res = await fetch(`${apiUrl}/ideas/filters`, {
-  //   //       method: "GET",
-  //   //       headers: { "Content-Type": "application/json" },
-  //   //       credentials: "include",
-  //   //     });
-  //   //     const data = await res.json();
-  //   //     if (res.ok) {
-  //   setCategories(data.data.categories || []);
-  //   setDurations(data.data.durations || []);
-  //   setPriceRanges(data.data.priceRanges || []);
-  //   setGroupSizes(data.data.groupSizes || []);
-  //   //   }
-  //   // } catch (error) {
-  //   //   console.error("Error fetching filters:", error);
-  //   // }
-
-  //   // fetchFilters();
-  // }, []);
 
   useEffect(() => {
     // Fetch ideas based on filters

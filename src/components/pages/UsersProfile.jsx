@@ -50,6 +50,7 @@ export default function UsersProfile() {
 
         const data = await res.json();
         if (data.success) {
+          console.log("Sent follow requests:", data.data);
           setSentFollowRequest(data.data.some((req) => req.toUserId === userId));
         } else {
           console.error("Failed to fetch sent follow requests:", data.message);
@@ -119,6 +120,29 @@ export default function UsersProfile() {
     fetchUserProfile();
   }, [userId, currentUser, refreshTrigger]);
 
+  // Check if the user is following this profile
+  useEffect(() => {
+    const checkFollowingStatus = async () => {
+      if (!userId || !currentUser) return;
+      try {
+        const res = await fetch(`${apiUrl}/follows/is-following/${userId}`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        });
+        const data = await res.json();
+        if (data.success) {
+          setIsFollowing(data.data);
+        } else {
+          console.error("Failed to check following status:", data.message);
+        }
+      } catch (error) {
+        console.error("Error checking following status:", error);
+      }
+    };
+    checkFollowingStatus();
+  }, [userId, currentUser, refreshTrigger]);
+
   const handleFollowToggle = async () => {
     try {
       const route = isFollowing ? `follows/${userId}/unfollow` : `follow-requests/${userId}`;
@@ -131,7 +155,16 @@ export default function UsersProfile() {
 
       const data = await res.json();
       if (data.success) {
-        setIsFollowing(!isFollowing);
+        console.log("Follow toggle response:", data);
+        if (isFollowing) {
+          // Unfollowing
+          setIsFollowing(false);
+          setAlreadyFollowing(false);
+        } else {
+          // Sending follow request
+          setSentFollowRequest(true);
+        }
+
         // Update follower count in userData
         if (userData?._count) {
           setUserData((prev) => ({
@@ -153,7 +186,6 @@ export default function UsersProfile() {
 
         // If we just started following and currently have basic access, refetch profile
         if (!isFollowing && userDataLevel === "basic") {
-          // Refetch profile to get updated data with potentially higher access level
           window.location.reload();
         }
       }
@@ -174,7 +206,6 @@ export default function UsersProfile() {
       const data = await res.json();
       if (data.success) {
         setSentFollowRequest(false);
-        alert("Follow request cancelled successfully.");
       }
     } catch (error) {
       console.error("Failed to cancel follow request:", error);
@@ -224,30 +255,33 @@ export default function UsersProfile() {
                     </h2>
 
                     {/* Follow/Unfollow Button */}
-                    {!isOwnProfile && !sentFollowRequest && (
+                    {!isOwnProfile && (
                       <button
-                        onClick={handleFollowToggle}
+                        onClick={sentFollowRequest ? cancelSentFollowRequest : handleFollowToggle}
                         className={`mt-4 px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 mx-auto ${
                           isFollowing
                             ? "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
-                            : "bg-purple-600 text-white hover:bg-purple-700"
+                            : sentFollowRequest
+                              ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300 hover:bg-yellow-200 dark:hover:bg-yellow-800"
+                              : "bg-purple-600 text-white hover:bg-purple-700"
                         }`}
                       >
                         {isFollowing ? (
-                          <UserMinus className="w-4 h-4" />
+                          <>
+                            <UserMinus className="w-4 h-4" />
+                            <span>Unfollow</span>
+                          </>
+                        ) : sentFollowRequest ? (
+                          <>
+                            <UserMinus className="w-4 h-4" />
+                            <span>Cancel Request</span>
+                          </>
                         ) : (
-                          <UserPlus className="w-4 h-4" />
+                          <>
+                            <UserPlus className="w-4 h-4" />
+                            <span>Follow</span>
+                          </>
                         )}
-                        <span>{isFollowing ? "Unfollow" : "Follow"}</span>
-                      </button>
-                    )}
-
-                    {!isOwnProfile && sentFollowRequest && (
-                      <button
-                        className="mt-4 px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
-                        onClick={() => cancelSentFollowRequest()}
-                      >
-                        <span>Cancel follow request</span>
                       </button>
                     )}
 

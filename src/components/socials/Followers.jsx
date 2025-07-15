@@ -32,6 +32,7 @@ export default function Followers({ isExpanded, setIsExpanded }) {
         }
         const data = await response.json();
         if (response.ok) {
+          console.log("Followers data:", data);
           setFollowers(data.data);
         }
       } catch (err) {
@@ -88,6 +89,7 @@ export default function Followers({ isExpanded, setIsExpanded }) {
             <FollowRequestItem
               key={request.followerId}
               username={request.followerUsername}
+              avatar={request.avatarUrl}
               id={request.followerId}
               onReject={onCancel}
               isProcessing={processingIds.has(request.id)}

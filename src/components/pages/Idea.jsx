@@ -26,6 +26,7 @@ import {
   Hash,
 } from "lucide-react";
 import { AuthContext } from "../auth/index.js";
+import { del } from "framer-motion/client";
 
 export default function Idea() {
   const { user, avatarUrl } = useContext(AuthContext);
@@ -51,10 +52,9 @@ export default function Idea() {
   const [isLoading, setIsLoading] = useState(true);
   const [commentsLoading, setCommentsLoading] = useState(true);
   const [ratingLoading, setRatingLoading] = useState(true);
+  const [addCommentLoading, setAddCommentLoading] = useState(false);
 
-  function delay(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
+  const [averageRating, setAverageRating] = useState(0);
   // Fetch idea data
   useEffect(() => {
     const fetchIdeaData = async () => {
@@ -66,8 +66,10 @@ export default function Idea() {
         });
         const data = await res.json();
         if (data.success) {
+          console.log("Fetched idea data:", data.data);
           setIdeaData(data.data);
           setUserStatus(data.data.userStatus);
+          setAverageRating(data.data.stats?.averageRating || 0);
         }
       } catch (error) {
         console.error("Failed to fetch idea data:", error);
@@ -129,6 +131,27 @@ export default function Idea() {
     fetchUserRating();
   }, [refreshTrigger, ideaId]);
 
+  // Fetch avg rating and save locally
+  useEffect(() => {
+    const fetchAvgRating = async () => {
+      try {
+        const res = await fetch(`${apiUrl}/ideas/${ideaId}/average-rating`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        });
+        const data = await res.json();
+        if (data.success) {
+          console.log("Fetched average rating:", data.data);
+          setAverageRating(data.data || 0);
+        }
+      } catch (error) {
+        console.error("Failed to fetch average rating:", error);
+      }
+    };
+    fetchAvgRating();
+  }, [ideaId, userRating]);
+
   const handleLikeComment = async (commentId) => {
     try {
       const res = await fetch(`${apiUrl}/comments/${commentId}/like`, {
@@ -158,7 +181,7 @@ export default function Idea() {
 
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
-
+    setAddCommentLoading(true);
     try {
       const res = await fetch(`${apiUrl}/comments/${ideaId}`, {
         method: "POST",
@@ -186,6 +209,8 @@ export default function Idea() {
       }
     } catch (error) {
       console.error("Failed to add comment:", error);
+    } finally {
+      setAddCommentLoading(false);
     }
   };
 
@@ -444,7 +469,7 @@ export default function Idea() {
                                 hoverRating={hoverRating}
                                 setHoverRating={setHoverRating}
                                 handleRating={handleRating}
-                                averageRating={ideaData.averageRating}
+                                averageRating={averageRating || 0}
                               />
                             )}
                           </div>
@@ -503,6 +528,7 @@ export default function Idea() {
               setCurrentPage={setCurrentPage}
               newComment={newComment}
               setNewComment={setNewComment}
+              addCommentLoading={addCommentLoading}
               handleAddComment={handleAddComment}
               handleLikeComment={handleLikeComment}
               setComments={setComments}

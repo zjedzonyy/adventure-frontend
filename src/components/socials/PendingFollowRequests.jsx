@@ -108,6 +108,7 @@ export default function PendingFollowRequests({ isExpanded, setIsExpanded }) {
               key={request.id}
               username={request.fromUsername}
               id={request.id}
+              avatar={request.avatarUrl}
               onAccept={onAccept}
               onReject={onReject}
               isProcessing={processingIds.has(request.id)}

@@ -89,6 +89,7 @@ export default function Followings({ isExpanded, setIsExpanded }) {
             <FollowRequestItem
               key={request.followingId}
               username={request.followingUsername}
+              avatar={request.avatarUrl}
               id={request.followingId}
               onReject={onCancel}
               isProcessing={processingIds.has(request.id)}

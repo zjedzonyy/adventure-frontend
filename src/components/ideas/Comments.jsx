@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { AuthContext } from "../auth";
-import { SortComponent } from "../common";
+import { LoadingWrapper } from "../common/index";
 import { apiUrl } from "../../utils";
 import {
   User,
@@ -25,6 +25,7 @@ export default function Comments({
   handleAddComment,
   handleLikeComment,
   commentsCount,
+  addCommentLoading,
   setCommentSortChange,
   commentSort,
   setCommentSort,
@@ -123,16 +124,18 @@ export default function Comments({
               className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none"
               rows="4"
             />
-            <div className="flex justify-end mt-3">
-              <button
-                onClick={handleAddComment}
-                disabled={!newComment.trim()}
-                className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
-              >
-                <Send className="w-4 h-4" />
-                <span>Post Comment</span>
-              </button>
-            </div>
+            <LoadingWrapper loading={addCommentLoading} page={false}>
+              <div className="flex justify-end mt-3">
+                <button
+                  onClick={handleAddComment}
+                  disabled={!newComment.trim()}
+                  className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+                >
+                  <Send className="w-4 h-4" />
+                  <span>Post Comment</span>
+                </button>
+              </div>
+            </LoadingWrapper>
           </div>
         </div>
       </div>

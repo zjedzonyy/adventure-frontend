@@ -1,14 +1,29 @@
 import React from "react";
 import { User, Check, X } from "lucide-react";
 
-export default function FollowRequestItem({ username, id, onAccept, onReject, isProcessing }) {
+export default function FollowRequestItem({
+  username,
+  id,
+  onAccept,
+  onReject,
+  isProcessing,
+  avatar,
+}) {
   return (
     <div className="border dark:border-gray-700 rounded-lg p-3 sm:p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
       <div className="flex items-center justify-between">
         {/* Left: Avatar + Username */}
         <div className="flex items-center space-x-3 flex-1 min-w-0">
           <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-            <User className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            {avatar ? (
+              <img
+                src={avatar}
+                alt={`${username}'s avatar`}
+                className="w-full h-full rounded-full object-cover"
+              />
+            ) : (
+              <User className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+            )}
           </div>
           <div className="min-w-0 flex-1">
             <h4 className="font-semibold text-gray-900 dark:text-white text-sm sm:text-base truncate">

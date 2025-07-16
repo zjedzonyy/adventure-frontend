@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { apiUrl } from "../../utils/api.js";
 import { User, Mail, Lock, Eye, EyeOff, AlertCircle, Sun, Moon } from "lucide-react";
 import { AuthContext } from "../auth/index.js";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import LoadingWrapper from "../common/LoadingIcon.jsx";
 
 export default function SignUp() {
@@ -12,7 +12,6 @@ export default function SignUp() {
     email: "",
     password: "",
   });
-  const [backendData, setBackendData] = useState({});
 
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -24,7 +23,7 @@ export default function SignUp() {
     sendData: "",
   });
 
-  const { darkMode, toggleDarkMode } = React.useContext(AuthContext);
+  const { darkMode, toggleDarkMode, showToast } = React.useContext(AuthContext);
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
@@ -33,10 +32,10 @@ export default function SignUp() {
   const validateConfirmPassword = (password, confirm) => {
     if (password && confirm) {
       if (password !== confirm) {
-        setError((prev) => ({ ...prev, confirmPassword: "Passwords do not match" }));
+        setError(prev => ({ ...prev, confirmPassword: "Passwords do not match" }));
         return false;
       } else {
-        setError((prev) => ({ ...prev, confirmPassword: "" }));
+        setError(prev => ({ ...prev, confirmPassword: "" }));
         return true;
       }
     }
@@ -46,32 +45,32 @@ export default function SignUp() {
   const validateEmail = () => {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (registerData.email && !emailPattern.test(registerData.email)) {
-      setError((prev) => ({ ...prev, email: "Invalid email format" }));
+      setError(prev => ({ ...prev, email: "Invalid email format" }));
       return false;
     }
-    setError((prev) => ({ ...prev, email: "" }));
+    setError(prev => ({ ...prev, email: "" }));
     return true;
   };
 
   const validatePassword = () => {
     if (registerData.password.length < 8) {
-      setError((prev) => ({ ...prev, password: "Password must be at least 8 characters" }));
+      setError(prev => ({ ...prev, password: "Password must be at least 8 characters" }));
       return false;
     } else if (!/[A-Z]/.test(registerData.password)) {
-      setError((prev) => ({
+      setError(prev => ({
         ...prev,
         password: "Password must contain at least one uppercase letter",
       }));
       return false;
     } else if (!/[0-9]/.test(registerData.password)) {
-      setError((prev) => ({ ...prev, password: "Password must contain at least one number" }));
+      setError(prev => ({ ...prev, password: "Password must contain at least one number" }));
       return false;
     }
-    setError((prev) => ({ ...prev, password: "" }));
+    setError(prev => ({ ...prev, password: "" }));
     return true;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
 
     const isEmailValid = validateEmail();
@@ -88,9 +87,9 @@ export default function SignUp() {
           body: JSON.stringify(registerData),
         });
         const data = await res.json();
-        if (data.field && data.message) {
+        if (!res.ok) {
           // If the response contains a field and message, set the error state
-          setError((prev) => {
+          setError(prev => {
             const newError = {
               ...prev,
               sendData: "",
@@ -99,13 +98,17 @@ export default function SignUp() {
             return newError;
           });
         } else {
-          setBackendData(data);
-          alert("Account created successfully!");
-          navigate("/login");
+          showToast({
+            severity: "success",
+            detail: "Account created!",
+          });
+          setTimeout(() => {
+            navigate("/login");
+          }, 1500);
         }
       } catch (error) {
         console.error(error);
-        setError((prev) => ({
+        setError(prev => ({
           ...prev,
           sendData: "An error occurred. Please try again.",
         }));
@@ -114,7 +117,7 @@ export default function SignUp() {
       }
     } else {
       // Clear the general error message since specific errors are already shown
-      setError((prev) => ({
+      setError(prev => ({
         ...prev,
         sendData: "",
       }));
@@ -179,7 +182,7 @@ export default function SignUp() {
             </p>
           </div>
 
-          {(error.sendData || backendData.message) && (
+          {error.sendData && (
             <div
               className={`p-3 rounded-lg mb-4 transition-all duration-300 ease-in-out ${
                 darkMode
@@ -189,7 +192,7 @@ export default function SignUp() {
             >
               <div className="flex items-center">
                 <AlertCircle className="w-4 h-4 mr-2" />
-                <span className="font-medium text-sm">{error.sendData || backendData.message}</span>
+                <span className="font-medium text-sm">{error.sendData}</span>
               </div>
             </div>
           )}
@@ -231,9 +234,9 @@ export default function SignUp() {
                   }`}
                   placeholder="Username"
                   value={registerData.username}
-                  onChange={(e) => {
+                  onChange={e => {
                     setRegisterData({ ...registerData, username: e.target.value });
-                    setError((prev) => ({ ...prev, username: "" }));
+                    setError(prev => ({ ...prev, username: "" }));
                   }}
                 />
               </div>
@@ -275,9 +278,9 @@ export default function SignUp() {
                   }`}
                   placeholder="user@gmail.com"
                   value={registerData.email}
-                  onChange={(e) => {
+                  onChange={e => {
                     setRegisterData({ ...registerData, email: e.target.value });
-                    setError((prev) => ({ ...prev, email: "" }));
+                    setError(prev => ({ ...prev, email: "" }));
                   }}
                 />
               </div>
@@ -318,9 +321,9 @@ export default function SignUp() {
                   }`}
                   placeholder="minimum 8 characters"
                   value={registerData.password}
-                  onChange={(e) => {
+                  onChange={e => {
                     setRegisterData({ ...registerData, password: e.target.value });
-                    setError((prev) => ({ ...prev, password: "" }));
+                    setError(prev => ({ ...prev, password: "" }));
                   }}
                   onBlur={() => {
                     validatePassword();
@@ -381,15 +384,14 @@ export default function SignUp() {
                   }`}
                   placeholder="Confirm password"
                   value={confirmPassword}
-                  onChange={(e) => {
+                  onChange={e => {
                     setConfirmPassword(e.target.value);
-                    setError((prev) => ({ ...prev, confirmPassword: "" }));
+                    setError(prev => ({ ...prev, confirmPassword: "" }));
                   }}
-                  onBlur={(e) => validateConfirmPassword(registerData.password, e.target.value)}
+                  onBlur={e => validateConfirmPassword(registerData.password, e.target.value)}
                 />
               </div>
             </div>
-
             <button
               type="submit"
               className={`w-full py-3 rounded-lg font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 ${

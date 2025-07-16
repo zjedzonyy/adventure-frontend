@@ -5,11 +5,11 @@ import { Navbar, Footer } from "../layout/index.js";
 import { IdeaCard } from "../ideas/index.js";
 import { LoadingWrapper } from "../common/index.js";
 
-import { Compass, Users, Heart, Star, Plus, Dice1 } from "lucide-react";
+import { Compass, Users, Plus } from "lucide-react";
 import { apiUrl } from "../../utils/api.js";
 
 export default function Homepage() {
-  const { user, darkMode, toggleDarkMode, labels } = React.useContext(AuthContext);
+  const { user, darkMode } = React.useContext(AuthContext);
   const [sampleIdeas, setSampleIdeas] = useState(null);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -35,7 +35,7 @@ export default function Homepage() {
     }
   };
 
-  const navigateTo = (path) => {
+  const navigateTo = path => {
     if (!user) {
       navigate("/login", { state: { from: path } });
       return;
@@ -122,7 +122,7 @@ export default function Homepage() {
             </div>
 
             <div className="flex flex-wrap gap-3 justify-center lg:justify-end max-w-lg">
-              {categories.map((category) => (
+              {categories.map(category => (
                 <button
                   key={category}
                   className="px-5 py-3 bg-gray-100 text-gray-700 rounded-full dark:hover:bg-dark_secondary dark:hover:text-text_primary hover:bg-purple-100 hover:text-purple-700 transition-all duration-200 ease-in-out font-medium"
@@ -148,7 +148,7 @@ export default function Homepage() {
           </div>
           <LoadingWrapper loading={loading} page={false}>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {sampleIdeas?.map((idea) => (
+              {sampleIdeas?.map(idea => (
                 <IdeaCard idea={idea} key={idea.id}></IdeaCard>
               ))}
             </div>

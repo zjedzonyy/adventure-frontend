@@ -1,5 +1,7 @@
+/* eslint-disable no-undef */
 import { apiUrl, getFilters } from "../../utils/index.js";
 import { createContext, useState, useEffect, useCallback, useRef } from "react";
+import toast from "react-hot-toast";
 
 const AuthContext = createContext();
 export default AuthContext;
@@ -24,27 +26,42 @@ export function AuthProvider({ children }) {
     priceRanges: [],
     groups: [],
     locationTypes: [],
-    statusTypes: [],
+    _statusTypes: [],
+    get statusTypes() {
+      return this._statusTypes;
+    },
+    set statusTypes(value) {
+      this._statusTypes = value;
+    },
   });
   const [labelsLoading, setLabelsLoading] = useState(false);
+
+  // Use notificiation in every page
+  const showToast = ({ severity, detail }) => {
+    if (severity === "success") {
+      toast.success(detail);
+    } else if (severity === "error") {
+      toast.error(detail);
+    }
+  };
 
   // Refs to prevent multiple requests
   const authFetchRef = useRef(false);
   const labelsFetchRef = useRef(false);
 
   // DEBUG: Console log every state change
-  useEffect(() => {
-    console.log("AUTH STATE CHANGE:", {
-      user: user ? { id: user.id, username: user.username } : null,
-      loading,
-      avatarUrl: avatarUrl ? "present" : "null",
-      timestamp: new Date().toISOString(),
-    });
-  }, [user, loading, avatarUrl]);
+  // useEffect(() => {
+  //   console.log("AUTH STATE CHANGE:", {
+  //     user: user ? { id: user.id, username: user.username } : null,
+  //     loading,
+  //     avatarUrl: avatarUrl ? "present" : "null",
+  //     timestamp: new Date().toISOString(),
+  //   });
+  // }, [user, loading, avatarUrl]);
 
   // Theme management
   const toggleDarkMode = useCallback(() => {
-    setDarkMode((prev) => {
+    setDarkMode(prev => {
       const newMode = !prev;
       localStorage.setItem("theme", newMode ? "dark" : "light");
       return newMode;
@@ -66,7 +83,7 @@ export function AuthProvider({ children }) {
   }, [darkMode]);
 
   // Avatar management
-  const getCachedAvatar = useCallback((userId) => {
+  const getCachedAvatar = useCallback(userId => {
     const cached = localStorage.getItem(`avatar_${userId}`);
     const timestamp = localStorage.getItem(`avatar_${userId}_timestamp`);
 
@@ -100,23 +117,37 @@ export function AuthProvider({ children }) {
         return null;
       }
 
+      // Convert response to Base64 to avoid memory leaks
+      // It's more robust to store as Base64 in localStorage
       const blob = await response.blob();
-      if (blob.type && !blob.type.startsWith("image/")) {
-        console.error("Blob is not an image:", blob.type);
-        return null;
-      }
+      return new Promise(resolve => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64String = reader.result;
+          localStorage.setItem(`avatar_${userId}`, base64String);
+          localStorage.setItem(`avatar_${userId}_timestamp`, Date.now().toString());
 
-      const objectUrl = URL.createObjectURL(blob);
+          resolve(base64String);
+        };
+        reader.readAsDataURL(blob);
+      });
 
-      // Cache in localStorage
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        localStorage.setItem(`avatar_${userId}`, reader.result);
-        localStorage.setItem(`avatar_${userId}_timestamp`, Date.now().toString());
-      };
-      reader.readAsDataURL(blob);
+      // if (blob.type && !blob.type.startsWith("image/")) {
+      //   console.error("Blob is not an image:", blob.type);
+      //   return null;
+      // }
 
-      return objectUrl;
+      // const objectUrl = URL.createObjectURL(blob);
+
+      // // Cache in localStorage
+      // const reader = new FileReader();
+      // reader.onloadend = () => {
+      //   localStorage.setItem(`avatar_${userId}`, reader.result);
+      //   localStorage.setItem(`avatar_${userId}_timestamp`, Date.now().toString());
+      // };
+      // reader.readAsDataURL(blob);
+
+      // return objectUrl;
     } catch (error) {
       console.error("Avatar fetch error:", error);
       return null;
@@ -142,7 +173,7 @@ export function AuthProvider({ children }) {
   }, [user?.id, avatarUrl]);
 
   const loadAvatar = useCallback(
-    async (userData) => {
+    async userData => {
       if (!userData?.avatarUrl) {
         return;
       }
@@ -161,7 +192,7 @@ export function AuthProvider({ children }) {
   );
 
   const updateAvatar = useCallback(
-    async (newAvatarUrl) => {
+    async newAvatarUrl => {
       if (!user?.id) return;
 
       // Clear old cache
@@ -173,47 +204,46 @@ export function AuthProvider({ children }) {
         return;
       }
 
-      // Load new avatar
-      const avatarBlob = await fetchAndCacheAvatar(newAvatarUrl, user.id);
-      if (avatarBlob) {
-        setAvatarUrl(avatarBlob);
-      } else {
+      try {
+        const base64Avatar = await fetchAndCacheAvatar(newAvatarUrl, user.id);
+        if (base64Avatar) {
+          setAvatarUrl(base64Avatar);
+          setUser(prev => ({ ...prev, avatarUrl: newAvatarUrl }));
+
+          const updatedUser = { ...user, avatarUrl: newAvatarUrl };
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+        } else {
+          console.error("Failed to update avatar, no valid base64 returned");
+          setAvatarUrl(null);
+        }
+      } catch (error) {
+        console.error("Error updating avatar:", error);
         setAvatarUrl(null);
       }
     },
-    [user?.id, fetchAndCacheAvatar]
+    [user, fetchAndCacheAvatar]
   );
 
   const loginUser = useCallback(
-    async (userData) => {
+    async userData => {
       try {
-        console.log("loginUser called with:", userData);
-
         if (!userData) {
-          console.log("No userData provided, clearing user");
           setUser(null);
           setAvatarUrl(null);
           localStorage.removeItem("user");
           return;
         }
-        console.log("✅ Setting user immediately:", userData);
         // Set user state FIRST
         setUser(userData);
 
         // Save to localStorage immediately
         localStorage.setItem("user", JSON.stringify(userData));
 
-        console.log(" User set in state and localStorage");
-
         // Verify what's actually in localStorage
-        const savedCheck = localStorage.getItem("user");
-        console.log(
-          " Verification - localStorage contains:",
-          savedCheck ? JSON.parse(savedCheck) : "null"
-        );
+        // const savedCheck = localStorage.getItem("user");
 
         // Load avatar in background (don't wait for it)
-        loadAvatar(userData).catch((err) => {
+        loadAvatar(userData).catch(err => {
           console.error("Avatar loading failed:", err);
         });
       } catch (error) {
@@ -225,7 +255,6 @@ export function AuthProvider({ children }) {
   );
   const fetchUserProfile = useCallback(async () => {
     if (authFetchRef.current) {
-      console.log("Auth fetch already in progress, skipping...");
       return;
     }
 
@@ -234,29 +263,22 @@ export function AuthProvider({ children }) {
       setLoading(true);
       setAuthError(null);
 
-      console.log("Fetching user profile from:", `${apiUrl}/users/me`);
-
       const res = await fetch(`${apiUrl}/users/me`, {
         method: "GET",
         credentials: "include",
       });
-      console.log(" Fetch response status:", res.status);
-      console.log("Fetch response headers:", Object.fromEntries(res.headers.entries()));
 
       const data = await res.json();
-      console.log(" Fetch response data:", data);
 
       if (data.success && data.data) {
-        console.log("Setting user from fetch:", data.data);
         setUser(data.data);
         localStorage.setItem("user", JSON.stringify(data.data));
 
         // Load avatar in background
-        loadAvatar(data.data).catch((err) => {
+        loadAvatar(data.data).catch(err => {
           console.error("Avatar loading failed:", err);
         });
       } else {
-        console.log("No user data in response, clearing state");
         setUser(null);
         setAvatarUrl(null);
         localStorage.removeItem("user");
@@ -268,7 +290,6 @@ export function AuthProvider({ children }) {
       setAvatarUrl(null);
       localStorage.removeItem("user");
     } finally {
-      console.log("Fetch complete, setting loading to false");
       setLoading(false);
       authFetchRef.current = false;
     }
@@ -295,19 +316,16 @@ export function AuthProvider({ children }) {
   // Initialize auth on mount
   useEffect(() => {
     const initializeAuth = async () => {
-      console.log("🔍 Initializing auth...");
-
       // Check localStorage first
       const savedUser = localStorage.getItem("user");
       if (savedUser) {
         try {
           const userData = JSON.parse(savedUser);
-          console.log("Found user in localStorage:", userData);
           setUser(userData);
           setLoading(false);
 
           // Load avatar in background
-          loadAvatar(userData).catch((err) => {
+          loadAvatar(userData).catch(err => {
             console.error("Avatar loading failed:", err);
           });
         } catch (error) {
@@ -316,12 +334,12 @@ export function AuthProvider({ children }) {
           await fetchUserProfile();
         }
       } else {
-        console.log("No user in localStorage, fetching from server...");
         await fetchUserProfile();
       }
     };
 
     initializeAuth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Load labels on mount
@@ -378,6 +396,8 @@ export function AuthProvider({ children }) {
     labels,
     labelsLoading,
     fetchLabels,
+
+    showToast,
   };
 
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;

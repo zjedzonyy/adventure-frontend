@@ -1,12 +1,11 @@
-import React, { use, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import MDEditor from "@uiw/react-md-editor";
 import { LoadingWrapper } from "../common/index.js";
-import { Navbar, Footer, MainBackground } from "../layout/index.js";
+import { Navbar, Footer } from "../layout/index.js";
 import { Comments, IdeaDetailsProvider } from "../ideas/index.js";
 import { StarRating } from "../ui/index.js";
 import { apiUrl } from "../../utils/index.js";
-import { Editor } from "primereact/editor";
+import "quill/dist/quill.snow.css";
 
 import {
   Heart,
@@ -26,16 +25,14 @@ import {
   Hash,
 } from "lucide-react";
 import { AuthContext } from "../auth/index.js";
-import { del } from "framer-motion/client";
 
 export default function Idea() {
-  const { user, avatarUrl } = useContext(AuthContext);
+  const { showToast } = useContext(AuthContext);
   const { ideaId } = useParams();
   const [ideaData, setIdeaData] = useState(null);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [userStatus, setUserStatus] = useState(null);
-  const [currentCommentPage, setCurrentCommentPage] = useState(1);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -50,11 +47,13 @@ export default function Idea() {
   const [commentSort, setCommentSort] = useState("newest");
 
   const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false); // Nowy stan dla błędów
   const [commentsLoading, setCommentsLoading] = useState(true);
   const [ratingLoading, setRatingLoading] = useState(true);
   const [addCommentLoading, setAddCommentLoading] = useState(false);
 
   const [averageRating, setAverageRating] = useState(0);
+
   // Fetch idea data
   useEffect(() => {
     const fetchIdeaData = async () => {
@@ -64,17 +63,33 @@ export default function Idea() {
           headers: { "Content-Type": "application/json" },
           credentials: "include",
         });
+
+        if (!res.ok) {
+          if (res.status === 404) {
+            throw new Response("Idea not found", { status: 404 });
+          }
+          throw new Response("Failed to fetch idea", { status: res.status });
+        }
+
         const data = await res.json();
         if (data.success) {
-          console.log("Fetched idea data:", data.data);
           setIdeaData(data.data);
           setUserStatus(data.data.userStatus);
           setAverageRating(data.data.stats?.averageRating || 0);
+          setIsLoading(false);
+        } else {
+          throw new Response(data.message || "Failed to fetch idea", { status: 400 });
         }
       } catch (error) {
         console.error("Failed to fetch idea data:", error);
-      } finally {
+        setHasError(true);
         setIsLoading(false);
+
+        if (error instanceof Response) {
+          throw error;
+        }
+
+        throw new Response("Something went wrong", { status: 500 });
       }
     };
 
@@ -104,10 +119,11 @@ export default function Idea() {
         setCommentsLoading(false);
       }
     };
-    if (ideaId) {
+    if (ideaId && ideaData) {
       fetchComments();
     }
-  }, [ideaId, currentPage, commentSortChange, commentSort, refreshTrigger]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ideaId, ideaData, currentPage, commentSortChange, commentSort, refreshTrigger]);
 
   useEffect(() => {
     const fetchUserRating = async () => {
@@ -128,8 +144,10 @@ export default function Idea() {
         setRatingLoading(false);
       }
     };
-    fetchUserRating();
-  }, [refreshTrigger, ideaId]);
+    if (ideaData) {
+      fetchUserRating();
+    }
+  }, [refreshTrigger, ideaId, ideaData]);
 
   // Fetch avg rating and save locally
   useEffect(() => {
@@ -142,17 +160,18 @@ export default function Idea() {
         });
         const data = await res.json();
         if (data.success) {
-          console.log("Fetched average rating:", data.data);
           setAverageRating(data.data || 0);
         }
       } catch (error) {
         console.error("Failed to fetch average rating:", error);
       }
     };
-    fetchAvgRating();
-  }, [ideaId, userRating]);
+    if (ideaData) {
+      fetchAvgRating();
+    }
+  }, [ideaId, userRating, ideaData]);
 
-  const handleLikeComment = async (commentId) => {
+  const handleLikeComment = async commentId => {
     try {
       const res = await fetch(`${apiUrl}/comments/${commentId}/like`, {
         method: "POST",
@@ -162,8 +181,8 @@ export default function Idea() {
       const data = await res.json();
 
       if (data.success) {
-        setComments((prevComments) =>
-          prevComments.map((comment) =>
+        setComments(prevComments =>
+          prevComments.map(comment =>
             comment.id === commentId
               ? {
                   ...comment,
@@ -195,13 +214,13 @@ export default function Idea() {
         setNewComment("");
         // If API returns comment
         if (data.data) {
-          setComments((prevComments) => {
+          setComments(prevComments => {
             // First in
             return [data.data, ...prevComments];
           });
 
           // Update pagination
-          setPagination((prev) => ({
+          setPagination(prev => ({
             ...prev,
             totalItems: (prev?.totalItems || 0) + 1,
           }));
@@ -214,7 +233,7 @@ export default function Idea() {
     }
   };
 
-  const handleRating = async (rating) => {
+  const handleRating = async rating => {
     try {
       const res = await fetch(`${apiUrl}/ideas/${ideaId}/review`, {
         method: "POST",
@@ -225,14 +244,14 @@ export default function Idea() {
       const data = await res.json();
       if (data.success) {
         setUserRating(rating);
-        setRefreshTrigger((prev) => prev + 1);
+        setRefreshTrigger(prev => prev + 1);
       }
     } catch (error) {
       console.error("Failed to rate idea:", error);
     }
   };
 
-  const handleStatusChange = async (ideaStatus) => {
+  const handleStatusChange = async ideaStatus => {
     try {
       const res = await fetch(`${apiUrl}/ideas/${ideaId}/status`, {
         method: "POST",
@@ -249,7 +268,7 @@ export default function Idea() {
     }
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = status => {
     switch (status) {
       case "TODO":
         return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
@@ -264,7 +283,7 @@ export default function Idea() {
     }
   };
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     switch (status) {
       case "TODO":
         return <Target className="w-4 h-4" />;
@@ -279,6 +298,11 @@ export default function Idea() {
     }
   };
 
+  //  If we have an error, don't render the rest of the component
+  if (hasError) {
+    throw new Response("Idea not found", { status: 404 });
+  }
+
   return (
     <IdeaDetailsProvider>
       <div className="bg-gray-50 dark:bg-dark_background text-text_primary dark:text-text_secondary transition-colors duration-300">
@@ -287,35 +311,73 @@ export default function Idea() {
           {/* Main Idea Content - Full Width */}
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <LoadingWrapper loading={isLoading} page={true} loadingText="Loading idea...">
-              {!ideaData ? (
-                <div className="flex items-center justify-center h-64 text-gray-600 dark:text-text_secondary">
-                  Idea not found
+              {/* Ten fragment zostaje bez zmian, bo teraz ideaData będzie zawsze istnieć gdy isLoading=false */}
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-8">
+                {/* Header with Categories and Challenge Badge */}
+                <div className="mb-6">
+                  <div className="flex items-center flex-wrap gap-2 mb-4">
+                    {ideaData?.isChallenge && (
+                      <span className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 text-sm font-medium px-3 py-1 rounded-full flex items-center">
+                        <Award className="w-4 h-4 mr-1" />
+                        Challenge
+                      </span>
+                    )}
+                    {/* Categories */}
+                    {ideaData?.categories?.map((category, index) => (
+                      <span
+                        key={`cat-${index}`}
+                        className="bg-gradient-to-r from-purple-100 to-purple-200 dark:from-purple-800 dark:to-purple-700 text-purple-800 dark:text-purple-200 text-sm font-medium px-3 py-1 rounded-full whitespace-nowrap hover:shadow-md transition-shadow cursor-pointer"
+                      >
+                        #{category.label || category.name}
+                      </span>
+                    ))}
+                    {/* Group Sizes */}
+                    {ideaData?.groupSizes?.map((groupSize, index) => (
+                      <span
+                        key={`group-${index}`}
+                        className="bg-gradient-to-r from-blue-100 to-blue-200 dark:from-blue-800 dark:to-blue-700 text-blue-800 dark:text-blue-200 text-sm font-medium px-3 py-1 rounded-full whitespace-nowrap hover:shadow-md transition-shadow cursor-pointer flex items-center"
+                      >
+                        <Users className="w-3 h-3 mr-1" />
+                        {groupSize.label || groupSize.name}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              ) : (
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-8">
-                  {/* Header with Categories and Challenge Badge */}
-                  <div className="mb-6">
-                    <div className="flex items-center flex-wrap gap-2 mb-4">
-                      {ideaData.isChallenge && (
-                        <span className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 text-sm font-medium px-3 py-1 rounded-full flex items-center">
-                          <Award className="w-4 h-4 mr-1" />
-                          Challenge
-                        </span>
-                      )}
-                      {/* Categories */}
-                      {ideaData.categories?.map((category, index) => (
+
+                {/* Title and Description */}
+                <div className="mb-8">
+                  <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 break-words">
+                    {ideaData?.title}
+                  </h1>
+                  <p className="text-xl text-gray-600 dark:text-gray-400 leading-relaxed break-words">
+                    {ideaData?.description}
+                  </p>
+                </div>
+
+                {/* Hashtags Section - Categories and Group Sizes */}
+                {(ideaData?.data?.categories?.length > 0 ||
+                  ideaData?.data?.groupSizes?.length > 0) && (
+                  <div className="mb-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                      Tags & Groups
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {/* Category Hashtags */}
+                      {ideaData?.data?.categories?.map((category, index) => (
                         <span
-                          key={`cat-${index}`}
-                          className="bg-gradient-to-r from-purple-100 to-purple-200 dark:from-purple-800 dark:to-purple-700 text-purple-800 dark:text-purple-200 text-sm font-medium px-3 py-1 rounded-full whitespace-nowrap hover:shadow-md transition-shadow cursor-pointer"
+                          key={`hashtag-cat-${index}`}
+                          className="inline-flex items-center bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs font-medium px-2.5 py-1 rounded-md hover:bg-purple-100 dark:hover:bg-purple-900/50 transition-colors cursor-pointer"
                         >
-                          #{category.label || category.name}
+                          <Hash className="w-3 h-3 mr-1" />
+                          {category.label || category.name}
                         </span>
                       ))}
-                      {/* Group Sizes */}
-                      {ideaData.groupSizes?.map((groupSize, index) => (
+
+                      {/* Group Size Hashtags */}
+                      {ideaData?.data?.groupSizes?.map((groupSize, index) => (
                         <span
-                          key={`group-${index}`}
-                          className="bg-gradient-to-r from-blue-100 to-blue-200 dark:from-blue-800 dark:to-blue-700 text-blue-800 dark:text-blue-200 text-sm font-medium px-3 py-1 rounded-full whitespace-nowrap hover:shadow-md transition-shadow cursor-pointer flex items-center"
+                          key={`hashtag-group-${index}`}
+                          className="inline-flex items-center bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-medium px-2.5 py-1 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors cursor-pointer"
                         >
                           <Users className="w-3 h-3 mr-1" />
                           {groupSize.label || groupSize.name}
@@ -323,198 +385,161 @@ export default function Idea() {
                       ))}
                     </div>
                   </div>
+                )}
 
-                  {/* Title and Description */}
-                  <div className="mb-8">
-                    <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 break-words">
-                      {ideaData.title}
-                    </h1>
-                    <p className="text-xl text-gray-600 dark:text-gray-400 leading-relaxed break-words">
-                      {ideaData.description}
-                    </p>
+                {/* Author and Meta Info */}
+                <div className="flex flex-wrap items-center justify-between gap-y-4 mb-8 pb-6 border-b dark:border-gray-700">
+                  <div className="flex items-center space-x-4 w-full sm:w-auto">
+                    <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
+                      {/* Avatar */}
+                      {ideaData?.author?.avatarUrl ? (
+                        <img
+                          src={ideaData.author.avatarUrl}
+                          alt={ideaData.author.username}
+                          className="w-12 h-12 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
+                          <User className="w-8 h-8 text-white" />
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900 dark:text-white text-lg">
+                        {ideaData?.author?.username}
+                      </p>
+                      <p className="text-gray-500 dark:text-gray-400 flex items-center">
+                        <Calendar className="w-4 h-4 mr-1" />
+                        {ideaData?.createdAt &&
+                          new Date(ideaData.createdAt).toLocaleDateString("pl-PL")}
+                      </p>
+                    </div>
                   </div>
 
-                  {/* Hashtags Section - Categories and Group Sizes */}
-                  {(ideaData.data?.categories?.length > 0 ||
-                    ideaData.data?.groupSizes?.length > 0) && (
-                    <div className="mb-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                        Tags & Groups
-                      </h3>
-                      <div className="flex flex-wrap gap-2">
-                        {/* Category Hashtags */}
-                        {ideaData.data?.categories?.map((category, index) => (
-                          <span
-                            key={`hashtag-cat-${index}`}
-                            className="inline-flex items-center bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs font-medium px-2.5 py-1 rounded-md hover:bg-purple-100 dark:hover:bg-purple-900/50 transition-colors cursor-pointer"
-                          >
-                            <Hash className="w-3 h-3 mr-1" />
-                            {category.label || category.name}
-                          </span>
-                        ))}
+                  <div className="flex flex-col space-y-2 sm:flex-wrap sm:flex-row sm:items-center  sm:space-x-6 w-full sm:w-auto">
+                    <div className="flex items-center space-x-1 text-gray-500 dark:text-gray-400">
+                      <Eye className="w-5 h-5" />
+                      <span className="font-medium">{ideaData?.viewCount}</span>
+                      <span className="text-sm">views</span>
+                    </div>
+                    <div className="flex items-center space-x-1 text-gray-500 dark:text-gray-400">
+                      <CheckCircle className="w-5 h-5 text-green-600" />
+                      <span className="font-medium">{ideaData?.completionCount}</span>
+                      <span className="text-sm">completed</span>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <button
+                        onClick={() =>
+                          showToast({
+                            severity: "error",
+                            detail: "Not ready yet",
+                          })
+                        }
+                        className="sm:p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900 rounded-lg transition-colors"
+                      >
+                        <Share2 className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
 
-                        {/* Group Size Hashtags */}
-                        {ideaData.data?.groupSizes?.map((groupSize, index) => (
-                          <span
-                            key={`hashtag-group-${index}`}
-                            className="inline-flex items-center bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-medium px-2.5 py-1 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors cursor-pointer"
-                          >
-                            <Users className="w-3 h-3 mr-1" />
-                            {groupSize.label || groupSize.name}
-                          </span>
-                        ))}
+                {/* Details Section */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                  <div className="flex items-center space-x-3 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <MapPin className="w-5 h-5 text-purple-600" />
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Location</p>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {ideaData?.locationType}
+                      </p>
+                    </div>
+                  </div>
+
+                  {ideaData?.duration && (
+                    <div className="flex items-center space-x-3 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <Clock className="w-5 h-5 text-blue-600" />
+                      <div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Duration</p>
+                        <p className="font-medium text-gray-900 dark:text-white">
+                          {ideaData.duration.label}
+                        </p>
                       </div>
                     </div>
                   )}
 
-                  {/* Author and Meta Info */}
-                  <div className="flex flex-wrap items-center justify-between gap-y-4 mb-8 pb-6 border-b dark:border-gray-700">
-                    <div className="flex items-center space-x-4 w-full sm:w-auto">
-                      <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
-                        {/* Avatar */}
-                        {ideaData.author.avatarUrl ? (
-                          <img
-                            src={ideaData.author.avatarUrl}
-                            alt={ideaData.author.username}
-                            className="w-12 h-12 rounded-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                            <User className="w-8 h-8 text-white" />
-                          </div>
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-semibold text-gray-900 dark:text-white text-lg">
-                          {ideaData.author.username}
-                        </p>
-                        <p className="text-gray-500 dark:text-gray-400 flex items-center">
-                          <Calendar className="w-4 h-4 mr-1" />
-                          {new Date(ideaData.createdAt).toLocaleDateString("pl-PL")}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col space-y-2 sm:flex-wrap sm:flex-row sm:items-center  sm:space-x-6 w-full sm:w-auto">
-                      <div className="flex items-center space-x-1 text-gray-500 dark:text-gray-400">
-                        <Eye className="w-5 h-5" />
-                        <span className="font-medium">{ideaData.viewCount}</span>
-                        <span className="text-sm">views</span>
-                      </div>
-                      <div className="flex items-center space-x-1 text-gray-500 dark:text-gray-400">
-                        <CheckCircle className="w-5 h-5 text-green-600" />
-                        <span className="font-medium">{ideaData.completionCount}</span>
-                        <span className="text-sm">completed</span>
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        <button
-                          onClick={() => alert("Share functionality not implemented yet")}
-                          className="sm:p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900 rounded-lg transition-colors"
-                        >
-                          <Share2 className="w-5 h-5" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Details Section */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                  {ideaData?.priceRange && (
                     <div className="flex items-center space-x-3 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <MapPin className="w-5 h-5 text-purple-600" />
+                      <DollarSign className="w-5 h-5 text-green-600" />
                       <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Location</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Price Range</p>
                         <p className="font-medium text-gray-900 dark:text-white">
-                          {ideaData.locationType}
+                          {ideaData.priceRange.label}
                         </p>
                       </div>
                     </div>
+                  )}
+                </div>
 
-                    {ideaData.duration && (
-                      <div className="flex items-center space-x-3 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        <Clock className="w-5 h-5 text-blue-600" />
-                        <div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">Duration</p>
-                          <p className="font-medium text-gray-900 dark:text-white">
-                            {ideaData.duration.label}
-                          </p>
+                {/* Rating and Actions Section */}
+                <div className="flex flex-col sm:flex-row items-center sm:items-center justify-between gap-6 mb-8 p-6 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-gray-700 dark:to-gray-600 rounded-lg">
+                  <div className="flex items-center space-x-6">
+                    <div>
+                      <LoadingWrapper loading={ratingLoading} page={false}>
+                        <div className="flex items-center space-x-1">
+                          {userRating === null ? (
+                            <p>Loading...</p>
+                          ) : (
+                            <StarRating
+                              userRating={userRating}
+                              setUserRating={setUserRating}
+                              hoverRating={hoverRating}
+                              setHoverRating={setHoverRating}
+                              handleRating={handleRating}
+                              averageRating={averageRating || 0}
+                            />
+                          )}
                         </div>
-                      </div>
-                    )}
-
-                    {ideaData.priceRange && (
-                      <div className="flex items-center space-x-3 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        <DollarSign className="w-5 h-5 text-green-600" />
-                        <div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">Price Range</p>
-                          <p className="font-medium text-gray-900 dark:text-white">
-                            {ideaData.priceRange.label}
-                          </p>
-                        </div>
-                      </div>
-                    )}
+                      </LoadingWrapper>
+                    </div>
                   </div>
 
-                  {/* Rating and Actions Section */}
-                  <div className="flex flex-col sm:flex-row items-center sm:items-center justify-between gap-6 mb-8 p-6 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-gray-700 dark:to-gray-600 rounded-lg">
-                    <div className="flex items-center space-x-6">
-                      <div>
-                        <LoadingWrapper loading={ratingLoading} page={false}>
-                          <div className="flex items-center space-x-1">
-                            {userRating === null ? (
-                              <p>Loading...</p>
-                            ) : (
-                              <StarRating
-                                userRating={userRating}
-                                setUserRating={setUserRating}
-                                hoverRating={hoverRating}
-                                setHoverRating={setHoverRating}
-                                handleRating={handleRating}
-                                averageRating={averageRating || 0}
-                              />
-                            )}
-                          </div>
-                        </LoadingWrapper>
-                      </div>
-                    </div>
+                  <div className="flex flex-col items-center sm:space-x-4 gap-2 text-text_secondary dark:text-text_primary">
+                    <select
+                      value={userStatus || ""}
+                      onChange={e => handleStatusChange(e.target.value)}
+                      className="p-1 sm:p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    >
+                      <option value="">Select status</option>
+                      <option value="TODO">Add to TODO</option>
+                      <option value="IN_PROGRESS">Mark as In Progress</option>
+                      <option value="COMPLETED">Mark as Completed</option>
+                      <option value="FAVORITED">Add to Favorites</option>
+                    </select>
 
-                    <div className="flex flex-col items-center sm:space-x-4 gap-2 text-text_secondary dark:text-text_primary">
-                      <select
-                        value={userStatus || ""}
-                        onChange={(e) => handleStatusChange(e.target.value)}
-                        className="p-1 sm:p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    {userStatus && (
+                      <div
+                        className={`flex items-center px-4 py-2 rounded-lg ${getStatusColor(userStatus)}`}
                       >
-                        <option value="">Select status</option>
-                        <option value="TODO">Add to TODO</option>
-                        <option value="IN_PROGRESS">Mark as In Progress</option>
-                        <option value="COMPLETED">Mark as Completed</option>
-                        <option value="FAVORITED">Add to Favorites</option>
-                      </select>
-
-                      {userStatus && (
-                        <div
-                          className={`flex items-center px-4 py-2 rounded-lg ${getStatusColor(userStatus)}`}
-                        >
-                          {getStatusIcon(userStatus)}
-                          <span className="ml-2 text-sm font-medium">
-                            {userStatus.replace("_", " ")}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Step-by-step Instructions Placeholder */}
-                  <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-                      Step-by-step Instructions
-                    </h2>
-                    <div
-                      dangerouslySetInnerHTML={{ __html: ideaData.detailedDescription }}
-                      className="prose dark:prose-invert text-text_secondary dark:text-text_primary"
-                    ></div>
+                        {getStatusIcon(userStatus)}
+                        <span className="ml-2 text-sm font-medium">
+                          {userStatus.replace("_", " ")}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
-              )}
+
+                {/* Step-by-step Instructions Placeholder */}
+                <div className="mb-8">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                    Step-by-step Instructions
+                  </h2>
+                  <div
+                    dangerouslySetInnerHTML={{ __html: ideaData?.detailedDescription }}
+                    className="ql-editor custom-prose text-text_secondary dark:text-text_primary"
+                  ></div>
+                </div>
+              </div>
             </LoadingWrapper>
           </div>
 

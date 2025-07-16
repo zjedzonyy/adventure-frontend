@@ -49,3 +49,30 @@ body {
   width: 100%;
   margin: 0 0;
 }
+
+.ql-editor.custom-prose h1 {
+  font-size: 2em !important;
+  font-weight: 700 !important;
+  margin: 1em 0 0.5em 0 !important;
+  line-height: 1.2 !important;
+}
+
+.ql-editor.custom-prose h2 {
+  font-size: 1.5em !important;
+  font-weight: 600 !important;
+  margin: 1em 0 0.5em 0 !important;
+  line-height: 1.3 !important;
+}
+
+.ql-editor.custom-prose h3 {
+  font-size: 1.25em !important;
+  font-weight: 600 !important;
+  margin: 1em 0 0.5em 0 !important;
+  line-height: 1.4 !important;
+}
+
+.ql-editor.custom-prose p {
+  font-size: 1em !important;
+  margin: 0.5em 0 !important;
+  line-height: 1.6 !important;
+}

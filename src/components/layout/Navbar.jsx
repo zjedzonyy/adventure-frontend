@@ -14,7 +14,7 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleLogout = async (e) => {
+  const handleLogout = async e => {
     e.preventDefault();
     setLoading(true);
     try {
@@ -141,7 +141,7 @@ export default function Navbar() {
           <div className="lg:hidden flex items-center space-x-2">
             {/* Hamburger toggle */}
             <button
-              onClick={() => setMobileMenuOpen((prev) => !prev)}
+              onClick={() => setMobileMenuOpen(prev => !prev)}
               aria-label="Toggle menu"
               className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition"
             >

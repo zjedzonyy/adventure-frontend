@@ -26,28 +26,14 @@ export default function Comments({
   handleLikeComment,
   commentsCount,
   addCommentLoading,
-  setCommentSortChange,
-  commentSort,
-  setCommentSort,
   setComments,
   setPagination,
 }) {
-  const { user, avatarUrl } = useContext(AuthContext);
+  const { user, avatarUrl, showToast } = useContext(AuthContext);
   const [editedCommentId, setEditedCommentId] = useState(null);
   const [editedContent, setEditedContent] = useState("");
 
-  const sortOptions = {
-    newest: { label: "Newest" },
-    oldest: { label: "Oldest" },
-    popular: { label: "Most Popular" },
-    least_popular: { label: "Least Popular" },
-    rating: { label: "Highest Rated" },
-    least_rating: { label: "Lowest Rated" },
-    completed: { label: "Most Completed" },
-    least_completed: { label: "Least Completed" },
-  };
-
-  const handleDeleteComment = async (commentId) => {
+  const handleDeleteComment = async commentId => {
     try {
       const res = await fetch(`${apiUrl}/comments/${commentId}`, {
         method: "DELETE",
@@ -58,10 +44,10 @@ export default function Comments({
       if (!res.ok) throw new Error("Failed to delete comment");
 
       // Delete from state
-      setComments((prevComments) => prevComments.filter((comment) => comment.id !== commentId));
+      setComments(prevComments => prevComments.filter(comment => comment.id !== commentId));
 
       // Change Comments Counter
-      setPagination((prevPagination) => ({
+      setPagination(prevPagination => ({
         ...prevPagination,
         totalItems: (prevPagination?.totalItems || 0) - 1,
       }));
@@ -72,7 +58,7 @@ export default function Comments({
     }
   };
 
-  const handleEditComment = async (commentId) => {
+  const handleEditComment = async commentId => {
     try {
       const res = await fetch(`${apiUrl}/comments/${commentId}`, {
         method: "PATCH",
@@ -84,8 +70,8 @@ export default function Comments({
       if (!res.ok) throw new Error("Failed to edit comment");
 
       // Update local state
-      setComments((prevComments) =>
-        prevComments.map((comment) =>
+      setComments(prevComments =>
+        prevComments.map(comment =>
           comment.id === commentId ? { ...comment, description: editedContent } : comment
         )
       );
@@ -119,7 +105,7 @@ export default function Comments({
           <div className="flex-1 text-text_secondary dark:text-text_primary">
             <textarea
               value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
+              onChange={e => setNewComment(e.target.value)}
               placeholder="Share your thoughts about this idea..."
               className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none"
               rows="4"
@@ -174,7 +160,7 @@ export default function Comments({
             className="max-w-xs"
             setCommentSortChange={setCommentSortChange}
           /> */}
-          {comments.map((comment) => (
+          {comments.map(comment => (
             <div key={comment.id} className="p-4 sm:p-6 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <div className="flex space-x-3 sm:space-x-4">
                 <div className="flex-shrink-0">
@@ -232,7 +218,12 @@ export default function Comments({
                         </>
                       )}
                       <button
-                        onClick={() => console.log("Report comment", comment.id)}
+                        onClick={() =>
+                          showToast({
+                            severity: "error",
+                            detail: "Comment reported. Thank you for your feedback!",
+                          })
+                        }
                         className="text-gray-500 hover:text-red-500 transition-colors p-1"
                       >
                         <Flag className="w-4 h-4" />
@@ -244,7 +235,7 @@ export default function Comments({
                     <div className="mt-3 w-full">
                       <textarea
                         value={editedContent}
-                        onChange={(e) => setEditedContent(e.target.value)}
+                        onChange={e => setEditedContent(e.target.value)}
                         rows="4"
                         className="w-full p-3 sm:p-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-800 dark:text-white resize-none transition text-sm sm:text-base"
                         placeholder="Edit your comment..."
@@ -275,7 +266,7 @@ export default function Comments({
         {totalPages > 1 && (
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 px-4">
             <button
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
               className="flex items-center space-x-2 px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
@@ -284,7 +275,7 @@ export default function Comments({
             </button>
 
             <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide max-w-full px-1">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
@@ -300,7 +291,7 @@ export default function Comments({
             </div>
 
             <button
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
               className="flex items-center space-x-2 px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >

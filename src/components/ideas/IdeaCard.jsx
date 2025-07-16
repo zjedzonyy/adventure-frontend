@@ -1,4 +1,4 @@
-import { Star, ClipboardCheck, Edit3, Eye } from "lucide-react";
+import { Star, ClipboardCheck, Eye } from "lucide-react";
 import { AuthContext } from "../auth/index.js";
 import { useContext } from "react";
 import { User } from "lucide-react";
@@ -8,7 +8,7 @@ export default function IdeaCard({ idea }) {
   const navigate = useNavigate();
 
   // Helper functions to map ids
-  const getDurationLabel = (durationId) => {
+  const getDurationLabel = durationId => {
     const durations = {
       1: "0-15 min",
       2: "15-30 min",
@@ -21,7 +21,7 @@ export default function IdeaCard({ idea }) {
     return durations[durationId] || "Unknown";
   };
 
-  const getPriceRangeLabel = (priceRangeId) => {
+  const getPriceRangeLabel = priceRangeId => {
     const priceRanges = {
       1: "Free",
       2: "1-5 $",
@@ -35,7 +35,7 @@ export default function IdeaCard({ idea }) {
     return priceRanges[priceRangeId] || "Unknown";
   };
 
-  const navigateTo = (path) => {
+  const navigateTo = path => {
     if (!user) {
       navigate("/login", { state: { from: path } });
       return;

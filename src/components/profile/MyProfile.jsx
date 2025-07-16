@@ -13,7 +13,6 @@ import {
   BookOpen,
   Target,
   Edit3,
-  Heart as HeartIcon,
   ChevronDown,
   ClipboardCheck,
 } from "lucide-react";
@@ -35,9 +34,7 @@ export default function MyProfile() {
           credentials: "include",
         });
         const data = await res.json();
-        if (data.success) {
-          console.log("Profile data fetched successfully:", data.data);
-        } else {
+        if (!data.success) {
           console.error("Failed to fetch profile data:", data.message);
         }
         setUserData(data.data);
@@ -46,7 +43,7 @@ export default function MyProfile() {
       }
     };
     fetchProfileData();
-  }, []);
+  }, [user.id]);
 
   if (!userData) return <div>Loading...</div>;
   return (
@@ -125,7 +122,7 @@ export default function MyProfile() {
               </div>
               {isExpanded && (
                 <div className="space-y-4">
-                  {userData?.ideas.map((idea) => (
+                  {userData?.ideas.map(idea => (
                     <div
                       key={idea.id}
                       className="border dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -194,7 +191,7 @@ export default function MyProfile() {
               </div>
               {todoExpanded && (
                 <div className="space-y-4">
-                  {userData?.todoIdeas.map((idea) => (
+                  {userData?.todoIdeas.map(idea => (
                     <div
                       key={idea.id}
                       className="border dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -259,7 +256,7 @@ export default function MyProfile() {
               </div>
               {savedExpanded && (
                 <div className="space-y-4">
-                  {userData?.favoritedIdeas.map((idea) => (
+                  {userData?.favoritedIdeas.map(idea => (
                     <div
                       key={idea.id}
                       className="border dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"

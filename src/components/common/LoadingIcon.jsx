@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { useEffect, useState } from "react";
 import { Atom } from "react-loading-indicators";
 
@@ -5,9 +6,9 @@ import { Atom } from "react-loading-indicators";
 function useDelayedLoading(loading, delay = 300) {
   const [showSpinner, setShowSpinner] = useState(false);
 
-  function delay(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
+  // function delay(ms) {
+  //   return new Promise(resolve => setTimeout(resolve, ms));
+  // }
 
   useEffect(() => {
     if (loading) {

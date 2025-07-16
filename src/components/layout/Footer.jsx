@@ -53,7 +53,7 @@ export default function Footer() {
           </div>
           <div className="text-gray-400 text-sm text-center">
             This project is my own take on the final assignment from The Odin Project. Big thanks to
-            the TOP community for the guidance and inspiration!
+            the TOP community for the guidance and inspiration.
           </div>
         </div>
       </div>

@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 
+// Reusable Dropdown component. It closes when clicking outside of it and supports custom items.
 export default function Dropdown({ buttonLabel = "Menu", items = [] }) {
   const [open, setOpen] = useState(false);
   const ref = useRef();
 
   useEffect(() => {
-    const closeOnOutsideClick = (e) => {
+    const closeOnOutsideClick = e => {
       if (ref.current && !ref.current.contains(e.target)) {
         setOpen(false);
       }
@@ -17,7 +18,7 @@ export default function Dropdown({ buttonLabel = "Menu", items = [] }) {
   return (
     <div className="relative inline-block text-left" ref={ref}>
       <button
-        onClick={() => setOpen((prev) => !prev)}
+        onClick={() => setOpen(prev => !prev)}
         className="inline-flex justify-center w-full rounded-md border border-gray-300 dark:border-gray-600 px-4 py-2 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
       >
         {buttonLabel}

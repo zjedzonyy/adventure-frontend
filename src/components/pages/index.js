@@ -1,5 +1,4 @@
 export { default as Homepage } from "./Homepage";
-export { default as Protected } from "./Protected";
 export { default as AddIdea } from "./AddIdea";
 export { default as EditIdea } from "./EditIdea";
 export { default as Idea } from "./Idea";

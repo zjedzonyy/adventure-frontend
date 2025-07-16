@@ -1,4 +1,5 @@
-import React from "react";
+import { useContext } from "react";
+import { AuthContext } from "../auth/index.js";
 import { AlertTriangle, Home, RefreshCw, ArrowLeft, Search, Bug, Wifi, Server } from "lucide-react";
 
 const ErrorPage = ({
@@ -10,9 +11,9 @@ const ErrorPage = ({
   onRefresh = () => window.location.reload(),
   showRefresh = true,
   showGoBack = true,
-  showSearch = false,
 }) => {
-  const getErrorConfig = (type) => {
+  const { showToast } = useContext(AuthContext);
+  const getErrorConfig = type => {
     switch (type) {
       case "404":
         return {
@@ -168,7 +169,7 @@ const ErrorPage = ({
               <div className="mt-8 p-4 bg-red-50 dark:bg-red-900/30 rounded-lg">
                 <p className="text-sm text-red-700 dark:text-red-300">
                   <span className="font-semibold">Server Error:</span> Something went wrong on our
-                  end. We're working to fix it.
+                  end. We&apos;re working to fix it.
                 </p>
               </div>
             )}
@@ -188,6 +189,12 @@ const ErrorPage = ({
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Need help? Contact our support team or check our{" "}
               <button
+                onClick={() =>
+                  showToast({
+                    severity: "error",
+                    detail: "We got u!",
+                  })
+                }
                 className={`text-${config.color}-600 hover:text-${config.color}-700 dark:text-${config.color}-400 dark:hover:text-${config.color}-300 font-medium hover:underline transition-colors`}
               >
                 help center

@@ -42,11 +42,11 @@ export default function Followings({ isExpanded, setIsExpanded }) {
       }
     };
     fetchrequests();
-  }, [isExpanded, refreshTrigger]);
+  }, [isExpanded, refreshTrigger, userIdFixed]);
 
   // Sop following user
-  const onCancel = async (followingsId) => {
-    setProcessingIds((prev) => new Set(prev).add(followingsId));
+  const onCancel = async followingsId => {
+    setProcessingIds(prev => new Set(prev).add(followingsId));
     try {
       const response = await fetch(`${apiUrl}/follows/${followingsId}/unfollow`, {
         method: "DELETE",
@@ -55,14 +55,14 @@ export default function Followings({ isExpanded, setIsExpanded }) {
       });
       const data = await response.json();
       if (data.success) {
-        setFollowings((prev) => prev.filter((request) => request.followingsId !== followingsId));
+        setFollowings(prev => prev.filter(request => request.followingsId !== followingsId));
       } else {
         throw new Error(data.message || "Failed to reject follow request");
       }
     } catch (err) {
       setError(err.message);
     } finally {
-      setProcessingIds((prev) => {
+      setProcessingIds(prev => {
         const copy = new Set(prev);
         copy.delete(followingsId);
         return copy;
@@ -85,7 +85,7 @@ export default function Followings({ isExpanded, setIsExpanded }) {
         {followings.length === 0 ? (
           <p className="text-gray-500 text-sm">{loading ? "Loading..." : "No followings"}</p>
         ) : (
-          followings.map((request) => (
+          followings.map(request => (
             <FollowRequestItem
               key={request.followingId}
               username={request.followingUsername}

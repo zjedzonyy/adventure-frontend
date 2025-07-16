@@ -23,20 +23,20 @@ export default function Settings() {
   const [followersIsExpanded, setFollowersIsExpanded] = useState(false);
   const [followingsIsExpanded, setFollowingsIsExpanded] = useState(false);
 
-  const handleFileChange = (e) => {
+  const handleFileChange = e => {
     setFile(e.target.files[0]);
     setMessage("");
     validateFileSize(e.target.files[0]);
     validateFileType(e.target.files[0]);
   };
 
-  const validateFileType = (file) => {
+  const validateFileType = file => {
     const validTypes = ["image/jpeg", "image/png", "image/jpg"];
     validTypes.includes(file.type) ||
       setMessage("Error: Invalid file type. Please upload a JPEG/JPG/PNG image.");
   };
 
-  const validateFileSize = (file) => {
+  const validateFileSize = file => {
     const maxSize = 5 * 1024 * 1024; // 10 MB
     file.size <= maxSize ||
       setMessage("Error: File size exceeds 5MB. Please upload a smaller image.");
@@ -47,6 +47,7 @@ export default function Settings() {
     if (avatarUrl) return setMessage("Error: Please delete your avatar first");
 
     setIsUploading(true);
+    // eslint-disable-next-line no-undef
     const formData = new FormData();
     formData.append("file", file);
 
@@ -62,7 +63,6 @@ export default function Settings() {
 
       const data = await res.json();
       if (data.success) {
-        console.log("Avatar updated:", data);
         setMessage(data.message || "Avatar updated successfully!");
         setFile(null);
         await updateAvatar(data.data);

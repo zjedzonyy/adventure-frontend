@@ -27,7 +27,6 @@ export default function SentFollowRequests({ isExpanded, setIsExpanded }) {
         const data = await response.json();
         if (response.ok) {
           setRequests(data.data);
-          console.log("Takie dostaje w request: ", data.data);
         }
       } catch (err) {
         setError(err.message);
@@ -38,8 +37,8 @@ export default function SentFollowRequests({ isExpanded, setIsExpanded }) {
     fetchrequests();
   }, [refreshTrigger]);
 
-  const onCancel = async (userId) => {
-    setProcessingIds((prev) => new Set(prev).add(userId));
+  const onCancel = async userId => {
+    setProcessingIds(prev => new Set(prev).add(userId));
     try {
       const response = await fetch(`${apiUrl}/follow-requests/sent/${userId}`, {
         method: "DELETE",
@@ -48,14 +47,14 @@ export default function SentFollowRequests({ isExpanded, setIsExpanded }) {
       });
       const data = await response.json();
       if (data.success) {
-        setRequests((prev) => prev.filter((request) => request.userId !== userId));
+        setRequests(prev => prev.filter(request => request.userId !== userId));
       } else {
         throw new Error(data.message || "Failed to reject follow request");
       }
     } catch (err) {
       setError(err.message);
     } finally {
-      setProcessingIds((prev) => {
+      setProcessingIds(prev => {
         const copy = new Set(prev);
         copy.delete(userId);
         return copy;
@@ -78,7 +77,7 @@ export default function SentFollowRequests({ isExpanded, setIsExpanded }) {
         {requests.length === 0 ? (
           <p className="text-gray-500 text-sm">{loading ? "Loading..." : "No requests"}</p>
         ) : (
-          requests.map((request) => (
+          requests.map(request => (
             <FollowRequestItem
               key={request.id}
               username={request.toUsername}

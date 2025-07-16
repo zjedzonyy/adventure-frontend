@@ -1,4 +1,3 @@
-import React from "react";
 import { User, Check, X } from "lucide-react";
 
 export default function FollowRequestItem({

@@ -1,18 +1,18 @@
+/* eslint-disable no-undef */
 import { AuthContext } from "../auth/index.js";
 import { Navbar, Footer } from "../layout/index.js";
 import { useContext, useState } from "react";
 import { apiUrl } from "../../utils/index.js";
-import { supabase } from "../../../config/supabase.js";
 import { Upload, Trash2, User, Camera, CheckCircle, AlertCircle } from "lucide-react";
 
 export default function EditAccount() {
-  const { user, avatarUrl, darkMode } = useContext(AuthContext);
+  const { avatarUrl, darkMode } = useContext(AuthContext);
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleFileChange = (e) => {
+  const handleFileChange = e => {
     setFile(e.target.files[0]);
     setMessage("");
   };

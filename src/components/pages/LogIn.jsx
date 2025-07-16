@@ -1,23 +1,8 @@
-import React, { useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 import { apiUrl } from "../../utils/api.js";
-import {
-  Search,
-  Compass,
-  Users,
-  Heart,
-  Star,
-  Plus,
-  User,
-  Mail,
-  Lock,
-  Eye,
-  EyeOff,
-  AlertCircle,
-  Sun,
-  Moon,
-} from "lucide-react";
+import { Compass, User, Lock, Eye, EyeOff, AlertCircle, Sun, Moon } from "lucide-react";
 import { AuthContext } from "../auth/index";
 import { LoadingWrapper } from "../common/index.js";
 
@@ -27,12 +12,13 @@ export default function LogIn() {
     username: "",
     password: "",
   });
+  // eslint-disable-next-line no-unused-vars
   const [demoData, setDemoData] = useState({
     username: "TestUser2",
     password: "Password1",
   });
   const [showPassword, setShowPassword] = useState(false);
-  const { darkMode, toggleDarkMode, loginUser, user } = useContext(AuthContext);
+  const { darkMode, toggleDarkMode, loginUser } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
@@ -48,13 +34,10 @@ export default function LogIn() {
     return false;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     if (validate()) {
       e.preventDefault();
       try {
-        console.log("Sending login request to:", `${apiUrl}/auth/login`);
-        console.log("Login data:", registerData);
-
         setLoading(true);
         const res = await fetch(`${apiUrl}/auth/login`, {
           method: "POST",
@@ -63,28 +46,13 @@ export default function LogIn() {
           credentials: "include",
         });
 
-        console.log(" Login response status:", res.status);
-        console.log(" Login response headers:", Object.fromEntries(res.headers.entries()));
-
         const data = await res.json();
-        console.log("Login response data:", data);
 
         if (data.name) {
-          console.log("Login failed:", data.message);
           setError(data.message);
         } else {
-          console.log("Login successful, calling loginUser with:", data.data);
-
-          // Call loginUser and wait for it
           await loginUser(data.data);
-
-          console.log("loginUser completed");
-
-          // Double check user state
-          console.log(" Current user context after login:", user);
-
           const from = location.state?.from || "/";
-          console.log("Navigating to:", from);
           navigate(from, { replace: true });
         }
       } catch (error) {
@@ -98,7 +66,7 @@ export default function LogIn() {
     }
   };
 
-  const handleDemoLogin = async (e) => {
+  const handleDemoLogin = async e => {
     e.preventDefault();
     setLoading(true);
     try {
@@ -221,7 +189,7 @@ export default function LogIn() {
                   }`}
                   placeholder="Username"
                   value={registerData.username}
-                  onChange={(e) => {
+                  onChange={e => {
                     setRegisterData({ ...registerData, username: e.target.value });
                     setError("");
                   }}
@@ -253,7 +221,7 @@ export default function LogIn() {
                   }`}
                   placeholder="Password"
                   value={registerData.password}
-                  onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
+                  onChange={e => setRegisterData({ ...registerData, password: e.target.value })}
                 />
                 <button
                   type="button"
@@ -300,7 +268,7 @@ export default function LogIn() {
                 darkMode ? "text-gray-300" : "text-gray-600"
               }`}
             >
-              Don't have an account yet?{" "}
+              Don&apos;t have an account yet?{" "}
               <NavLink to="/signup" end>
                 <button
                   className={`text-sm px-4 py-2 rounded-lg font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 ${

@@ -32,7 +32,6 @@ export default function Followers({ isExpanded, setIsExpanded }) {
         }
         const data = await response.json();
         if (response.ok) {
-          console.log("Followers data:", data);
           setFollowers(data.data);
         }
       } catch (err) {
@@ -42,11 +41,11 @@ export default function Followers({ isExpanded, setIsExpanded }) {
       }
     };
     fetchrequests();
-  }, [isExpanded, refreshTrigger]);
+  }, [isExpanded, refreshTrigger, userIdFixed]);
 
   // Remove follower
-  const onCancel = async (followerId) => {
-    setProcessingIds((prev) => new Set(prev).add(followerId));
+  const onCancel = async followerId => {
+    setProcessingIds(prev => new Set(prev).add(followerId));
     try {
       const response = await fetch(`${apiUrl}/follows/${followerId}/remove`, {
         method: "DELETE",
@@ -55,14 +54,14 @@ export default function Followers({ isExpanded, setIsExpanded }) {
       });
       const data = await response.json();
       if (data.success) {
-        setFollowers((prev) => prev.filter((request) => request.followerId !== followerId));
+        setFollowers(prev => prev.filter(request => request.followerId !== followerId));
       } else {
         throw new Error(data.message || "Failed to reject follow request");
       }
     } catch (err) {
       setError(err.message);
     } finally {
-      setProcessingIds((prev) => {
+      setProcessingIds(prev => {
         const copy = new Set(prev);
         copy.delete(followerId);
         return copy;
@@ -85,7 +84,7 @@ export default function Followers({ isExpanded, setIsExpanded }) {
         {followers.length === 0 ? (
           <p className="text-gray-500 text-sm">{loading ? "Loading..." : "No followers"}</p>
         ) : (
-          followers.map((request) => (
+          followers.map(request => (
             <FollowRequestItem
               key={request.followerId}
               username={request.followerUsername}

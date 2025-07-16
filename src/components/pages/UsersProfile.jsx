@@ -15,7 +15,6 @@ import {
   BookOpen,
   Target,
   Edit3,
-  Heart as HeartIcon,
   ChevronDown,
   ClipboardCheck,
   UserPlus,
@@ -50,8 +49,7 @@ export default function UsersProfile() {
 
         const data = await res.json();
         if (data.success) {
-          console.log("Sent follow requests:", data.data);
-          setSentFollowRequest(data.data.some((req) => req.toUserId === userId));
+          setSentFollowRequest(data.data.some(req => req.toUserId === userId));
         } else {
           console.error("Failed to fetch sent follow requests:", data.message);
         }
@@ -60,7 +58,7 @@ export default function UsersProfile() {
       }
     };
     fetchSentFollowRequests();
-  }, [isFollowing, refreshTrigger]);
+  }, [isFollowing, refreshTrigger, userId]);
 
   // Fetch user profile data
   useEffect(() => {
@@ -70,15 +68,12 @@ export default function UsersProfile() {
       setLoading(true);
       try {
         let endpoint;
-        let accessLevel;
 
         // Determine endpoint and access level
         if (userId === currentUser.id) {
           endpoint = `${apiUrl}/users/me`;
-          accessLevel = "private";
         } else {
           endpoint = `${apiUrl}/users/${userId}`;
-          accessLevel = "unknown"; // Backend will determine based on relationship
         }
 
         // Fetch user data
@@ -155,11 +150,9 @@ export default function UsersProfile() {
 
       const data = await res.json();
       if (data.success) {
-        console.log("Follow toggle response:", data);
         if (isFollowing) {
           // Unfollowing
           setIsFollowing(false);
-          setAlreadyFollowing(false);
         } else {
           // Sending follow request
           setSentFollowRequest(true);
@@ -167,7 +160,7 @@ export default function UsersProfile() {
 
         // Update follower count in userData
         if (userData?._count) {
-          setUserData((prev) => ({
+          setUserData(prev => ({
             ...prev,
             _count: {
               ...prev._count,
@@ -176,10 +169,10 @@ export default function UsersProfile() {
           }));
         } else if (userData?.follower) {
           // Handle case where follower is an array
-          setUserData((prev) => ({
+          setUserData(prev => ({
             ...prev,
             follower: isFollowing
-              ? prev.follower.filter((f) => f.id !== currentUser.id)
+              ? prev.follower.filter(f => f.id !== currentUser.id)
               : [...prev.follower, { id: currentUser.id }],
           }));
         }
@@ -192,7 +185,7 @@ export default function UsersProfile() {
     } catch (error) {
       console.error("Failed to toggle follow:", error);
     } finally {
-      setRefreshTrigger((prev) => prev + 1);
+      setRefreshTrigger(prev => prev + 1);
     }
   };
 
@@ -210,7 +203,7 @@ export default function UsersProfile() {
     } catch (error) {
       console.error("Failed to cancel follow request:", error);
     } finally {
-      setRefreshTrigger((prev) => prev + 1);
+      setRefreshTrigger(prev => prev + 1);
     }
   };
 
@@ -365,7 +358,7 @@ export default function UsersProfile() {
                             No ideas shared yet
                           </p>
                         ) : (
-                          userData.ideas.map((idea) => (
+                          userData.ideas.map(idea => (
                             <div
                               key={idea.id}
                               className="border dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -454,7 +447,7 @@ export default function UsersProfile() {
                             No todo items yet
                           </p>
                         ) : (
-                          userData.todoIdeas.map((idea) => (
+                          userData.todoIdeas.map(idea => (
                             <div
                               key={idea.id}
                               className="border dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -536,7 +529,7 @@ export default function UsersProfile() {
                             No saved ideas yet
                           </p>
                         ) : (
-                          userData.favoritedIdeas.map((idea) => (
+                          userData.favoritedIdeas.map(idea => (
                             <div
                               key={idea.id}
                               className="border dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"

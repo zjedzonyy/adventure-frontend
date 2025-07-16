@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { apiUrl } from "../../utils/index.js";
 import { LoadingWrapper } from "./index.js";
 
@@ -14,7 +15,7 @@ export default function UserSearchBar() {
 
   // Close dropdown when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = event => {
       if (
         searchRef.current &&
         !searchRef.current.contains(event.target) &&
@@ -68,7 +69,7 @@ export default function UserSearchBar() {
     return () => clearTimeout(debounceTimer);
   }, [searchQuery]);
 
-  const handleUserClick = (user) => {
+  const handleUserClick = user => {
     // Navigate to user profile
     window.location.href = `/profile/${user.id}`;
     setIsDropdownOpen(false);
@@ -92,7 +93,7 @@ export default function UserSearchBar() {
           type="text"
           placeholder="Search users..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={e => setSearchQuery(e.target.value)}
           className="w-full pl-10 pr-10 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
         />
         {searchQuery && (
@@ -114,7 +115,7 @@ export default function UserSearchBar() {
           <LoadingWrapper loading={isLoading} page={false} size="small">
             {searchResults.length > 0 ? (
               <>
-                {searchResults.map((user) => (
+                {searchResults.map(user => (
                   <button
                     key={user.id}
                     onClick={() => handleUserClick(user)}
@@ -162,7 +163,7 @@ export default function UserSearchBar() {
             ) : (
               <div className="px-4 py-3 text-center text-gray-500 dark:text-gray-400">
                 <User className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">Couldn't find anyone</p>
+                <p className="text-sm">Couldn&apos;t find anyone</p>
               </div>
             )}
           </LoadingWrapper>

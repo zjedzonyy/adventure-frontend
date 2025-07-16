@@ -11,15 +11,15 @@ export default function SortComponent({
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  const handleSortSelect = (sortKey) => {
+  const handleSortSelect = sortKey => {
     onSortChange(sortKey);
     setIsOpen(false);
-    setCommentSortChange((prev) => !prev); // Toggle comment sort change state
+    setCommentSortChange(prev => !prev); // Toggle comment sort change state
   };
 
   // Close dropdown when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = event => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
       }

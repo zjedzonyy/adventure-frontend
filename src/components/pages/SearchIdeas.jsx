@@ -21,13 +21,11 @@ export default function SearchIdeas() {
   const [currentPage, setCurrentPage] = useState(1);
   const resultsPerPage = 4;
   const resultsFilters = `&page=${currentPage}&limit=${resultsPerPage}`;
-  const [pagination, setPagination] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
   const [loading, setLoading] = useState(true);
   const [filtersLoading, setFiltersLoading] = useState(true);
-
   useEffect(() => {
     const fetchLabelsAgain = async () => {
       try {
@@ -39,6 +37,7 @@ export default function SearchIdeas() {
       }
     };
     fetchLabelsAgain();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -78,7 +77,6 @@ export default function SearchIdeas() {
         if (res.ok) {
           // Handle the fetched ideas data
           setIdeas(data.data.ideas || []);
-          setPagination(data.data.pagination || {});
           setTotalPages(data.data.pagination ? data.data.pagination.totalPages : 1);
           setTotalCount(data.data.pagination ? data.data.pagination.totalItems : 0);
         }
@@ -89,29 +87,14 @@ export default function SearchIdeas() {
       }
     };
     fetchIdeas();
-  }, [filters, currentPage]);
-
-  // ENUMS (can't fetch them from backend, so hardcoded)
-  const locationTypes = [
-    { value: "INDOOR", label: "Indoor" },
-    { value: "OUTDOOR", label: "Outdoor" },
-    { value: "HYBRID", label: "Hybrid" },
-    { value: "FLEXIBLE", label: "Flexible" },
-  ];
-
-  const statusTypes = [
-    { value: "TODO", label: "To Do" },
-    { value: "IN_PROGRESS", label: "In Progress" },
-    { value: "COMPLETED", label: "Completed" },
-    { value: "FAVORITED", label: "Favorited" },
-  ];
+  }, [filters, currentPage, resultsFilters]);
 
   const updateFilter = (key, value) => {
     const newFilters = { ...filters, [key]: value };
     setFilters(newFilters);
   };
 
-  const clearFilter = (key) => {
+  const clearFilter = key => {
     const newFilters = { ...filters };
     delete newFilters[key];
     setFilters(newFilters);
@@ -195,7 +178,7 @@ export default function SearchIdeas() {
                       <input
                         type="text"
                         value={filters.title || ""}
-                        onChange={(e) => updateFilter("title", e.target.value)}
+                        onChange={e => updateFilter("title", e.target.value)}
                         placeholder="Enter title..."
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                       />
@@ -209,11 +192,11 @@ export default function SearchIdeas() {
                         </label>
                         <select
                           value={filters.categoryIds || ""}
-                          onChange={(e) => updateFilter("categoryIds", e.target.value)}
+                          onChange={e => updateFilter("categoryIds", e.target.value)}
                           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                         >
                           <option value="">All categories</option>
-                          {labels.categories.map((cat) => (
+                          {labels.categories.map(cat => (
                             <option key={cat.id} value={cat.id}>
                               {cat.label}
                             </option>
@@ -229,11 +212,11 @@ export default function SearchIdeas() {
                       </label>
                       <select
                         value={filters.location_type || ""}
-                        onChange={(e) => updateFilter("location_type", e.target.value)}
+                        onChange={e => updateFilter("location_type", e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                       >
                         <option value="">All locations</option>
-                        {labels.locationTypes.map((type) => (
+                        {labels.locationTypes.map(type => (
                           <option key={type.value} value={type.value}>
                             {type.label}
                           </option>
@@ -249,11 +232,11 @@ export default function SearchIdeas() {
                         </label>
                         <select
                           value={filters.duration || ""}
-                          onChange={(e) => updateFilter("duration", e.target.value)}
+                          onChange={e => updateFilter("duration", e.target.value)}
                           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                         >
                           <option value="">Any duration</option>
-                          {labels.durations.map((duration) => (
+                          {labels.durations.map(duration => (
                             <option key={duration.id} value={duration.id}>
                               {duration.label}
                             </option>
@@ -270,11 +253,11 @@ export default function SearchIdeas() {
                         </label>
                         <select
                           value={filters.price || ""}
-                          onChange={(e) => updateFilter("price", e.target.value)}
+                          onChange={e => updateFilter("price", e.target.value)}
                           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                         >
                           <option value="">Any price</option>
-                          {labels.priceRanges.map((price) => (
+                          {labels.priceRanges.map(price => (
                             <option key={price.id} value={price.id}>
                               {price.label}
                             </option>
@@ -291,11 +274,11 @@ export default function SearchIdeas() {
                         </label>
                         <select
                           value={filters.groupIds || ""}
-                          onChange={(e) => updateFilter("groupIds", e.target.value)}
+                          onChange={e => updateFilter("groupIds", e.target.value)}
                           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                         >
                           <option value="">Any size</option>
-                          {labels.groups.map((group) => (
+                          {labels.groups.map(group => (
                             <option key={group.id} value={group.id}>
                               {group.label}
                             </option>
@@ -311,11 +294,11 @@ export default function SearchIdeas() {
                       </label>
                       <select
                         value={filters.status || ""}
-                        onChange={(e) => updateFilter("status", e.target.value)}
+                        onChange={e => updateFilter("status", e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                       >
                         <option value="">All statuses</option>
-                        {labels.statusTypes.map((status) => (
+                        {labels.statusTypes.map(status => (
                           <option key={status.value} value={status.value}>
                             {status.label}
                           </option>
@@ -329,7 +312,7 @@ export default function SearchIdeas() {
                         type="checkbox"
                         id="challenge"
                         checked={filters.challenge === "true"}
-                        onChange={(e) => updateFilter("challenge", e.target.checked ? "true" : "")}
+                        onChange={e => updateFilter("challenge", e.target.checked ? "true" : "")}
                         className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 dark:focus:ring-purple-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                       />
                       <label
@@ -379,7 +362,7 @@ export default function SearchIdeas() {
               <LoadingWrapper loading={loading} page={false}>
                 <div className="space-y-6">
                   {ideas.length > 0 ? (
-                    ideas.map((idea) => <IdeaCard key={idea.id} idea={idea} />)
+                    ideas.map(idea => <IdeaCard key={idea.id} idea={idea} />)
                   ) : (
                     <div className="text-center py-16">
                       <div className="text-gray-400 dark:text-gray-500 mb-4">
@@ -401,7 +384,7 @@ export default function SearchIdeas() {
                   <div className="mt-10 flex items-center justify-center">
                     <div className="flex items-center gap-1 max-w-full overflow-hidden">
                       <button
-                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                         disabled={currentPage === 1}
                         className="flex items-center justify-center p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-shrink-0"
                       >
@@ -428,7 +411,7 @@ export default function SearchIdeas() {
                       </div>
 
                       <button
-                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                         disabled={currentPage === totalPages}
                         className="flex items-center justify-center p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-shrink-0"
                       >

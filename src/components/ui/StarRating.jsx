@@ -1,19 +1,11 @@
-import React, { useState } from "react";
 import { Star } from "lucide-react";
 
-const StarRating = ({
-  userRating,
-  setUserRating,
-  hoverRating,
-  setHoverRating,
-  handleRating,
-  averageRating,
-}) => {
+const StarRating = ({ userRating, hoverRating, setHoverRating, handleRating, averageRating }) => {
   return (
     <div>
       <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Rate this idea</p>
       <div className="flex items-center space-x-1">
-        {[1, 2, 3, 4, 5].map((star) => (
+        {[1, 2, 3, 4, 5].map(star => (
           <div key={star} className="relative w-6 h-6 cursor-pointer">
             {/* Left half of the star*/}
             <div

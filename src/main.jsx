@@ -8,16 +8,14 @@ import {
   AddIdea,
   EditIdea,
   Idea,
-  Protected,
   SearchIdeas,
   LogIn,
   SignUp,
   UsersProfile,
   Settings,
-  EditAccount,
 } from "./components/pages";
 import { RequireAuth, ProtectedRoutes } from "./components/auth/index.js";
-import { ErrorPage, RouterErrorBoundary } from "./components/errors/index.js";
+import { RouterErrorBoundary } from "./components/errors/index.js";
 import { PrimeReactProvider } from "primereact/api";
 const router = createBrowserRouter([
   {

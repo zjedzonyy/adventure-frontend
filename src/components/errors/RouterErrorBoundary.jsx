@@ -11,7 +11,7 @@ const RouterErrorBoundary = () => {
   const handleRefresh = () => window.location.reload();
 
   // Describe error type
-  const getErrorType = (error) => {
+  const getErrorType = error => {
     if (error?.status === 404) return "404";
     if (error?.status === 400) return "400";
     if (error?.status === 500) return "500";
@@ -21,7 +21,7 @@ const RouterErrorBoundary = () => {
   };
 
   // Describe error
-  const getErrorContent = (error) => {
+  const getErrorContent = error => {
     const type = getErrorType(error);
 
     switch (type) {

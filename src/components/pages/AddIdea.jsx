@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, use } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Editor } from "primereact/editor";
 
@@ -8,7 +8,6 @@ import { apiUrl } from "../../utils/index.js";
 
 import {
   Plus,
-  User,
   FileText,
   Tag,
   Users,
@@ -17,12 +16,11 @@ import {
   MapPin,
   Award,
   Eye,
-  EyeOff,
   AlertCircle,
   Check,
 } from "lucide-react";
 export default function AddIdea() {
-  const { user, darkMode, labels } = useContext(AuthContext);
+  const { labels } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -114,14 +112,14 @@ export default function AddIdea() {
     if (field === "detailedDescription" && value && value.length > 2500) {
       return;
     }
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [field]: value,
     }));
 
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors((prev) => ({
+      setErrors(prev => ({
         ...prev,
         [field]: "",
       }));
@@ -131,16 +129,15 @@ export default function AddIdea() {
   const handleMultiSelect = (field, optionId) => {
     const currentSelection = formData[field];
     const newSelection = currentSelection.includes(optionId)
-      ? currentSelection.filter((id) => id !== optionId)
+      ? currentSelection.filter(id => id !== optionId)
       : [...currentSelection, optionId];
 
     handleInputChange(field, newSelection);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     if (!validateForm()) {
-      console.log("Form validation failed", errors);
       return;
     }
 
@@ -171,7 +168,7 @@ export default function AddIdea() {
         }, 2000);
       } else {
         if (data.field && data.message) {
-          setErrors((prev) => ({
+          setErrors(prev => ({
             ...prev,
             [data.field]: data.message,
           }));
@@ -240,7 +237,7 @@ export default function AddIdea() {
                 <input
                   type="text"
                   value={formData.title}
-                  onChange={(e) => handleInputChange("title", e.target.value)}
+                  onChange={e => handleInputChange("title", e.target.value)}
                   className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
                     errors.title ? "border-red-400" : "border-gray-300"
                   }`}
@@ -263,7 +260,7 @@ export default function AddIdea() {
               )}
               <textarea
                 value={formData.description}
-                onChange={(e) => handleInputChange("description", e.target.value)}
+                onChange={e => handleInputChange("description", e.target.value)}
                 rows={4}
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white resize-none ${
                   errors.description ? "border-red-400" : "border-gray-300"
@@ -291,7 +288,7 @@ export default function AddIdea() {
               >
                 <Editor
                   value={formData.detailedDescription}
-                  onTextChange={(e) => handleInputChange("detailedDescription", e.htmlValue || "")}
+                  onTextChange={e => handleInputChange("detailedDescription", e.htmlValue || "")}
                   style={{ height: "320px" }}
                   data-color-mode={
                     document.documentElement.classList.contains("dark") ? "dark" : "light"
@@ -312,7 +309,7 @@ export default function AddIdea() {
                 <p className="text-sm text-red-600 dark:text-red-400 mb-1">{errors.categories}</p>
               )}
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {availableOptions.categories.slice(1).map((category) => (
+                {availableOptions.categories.slice(1).map(category => (
                   <button
                     key={category.id}
                     type="button"
@@ -339,7 +336,7 @@ export default function AddIdea() {
                 <p className="text-sm text-red-600 dark:text-red-400 mb-1">{errors.groups}</p>
               )}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {availableOptions.groups.map((group) => (
+                {availableOptions.groups.map(group => (
                   <button
                     key={group.id}
                     type="button"
@@ -369,13 +366,13 @@ export default function AddIdea() {
                 <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <select
                   value={formData.priceRangeId}
-                  onChange={(e) => handleInputChange("priceRangeId", e.target.value)}
+                  onChange={e => handleInputChange("priceRangeId", e.target.value)}
                   className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
                     errors.priceRangeId ? "border-red-400" : "border-gray-300"
                   }`}
                 >
                   <option value="">Select price range...</option>
-                  {availableOptions.priceRanges.map((range) => (
+                  {availableOptions.priceRanges.map(range => (
                     <option key={range.id} value={range.id}>
                       {range.label}
                     </option>
@@ -396,7 +393,7 @@ export default function AddIdea() {
                 <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <select
                   value={formData.locationType}
-                  onChange={(e) => handleInputChange("locationType", e.target.value)}
+                  onChange={e => handleInputChange("locationType", e.target.value)}
                   className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
                     errors.locationType ? "border-red-400" : "border-gray-300"
                   }`}
@@ -404,7 +401,7 @@ export default function AddIdea() {
                   {/* Default option */}
                   <option value="">Select location type...</option>
                   {availableOptions.locationTypes.lenght !== 0 &&
-                    availableOptions.locationTypes.map((location) => (
+                    availableOptions.locationTypes.map(location => (
                       <option key={location.value} value={location.value}>
                         {location.label}
                       </option>
@@ -425,7 +422,7 @@ export default function AddIdea() {
                 <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <select
                   value={formData.durationId}
-                  onChange={(e) => handleInputChange("durationId", e.target.value)}
+                  onChange={e => handleInputChange("durationId", e.target.value)}
                   className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
                     errors.durationId ? "border-red-400" : "border-gray-300"
                   }`}
@@ -433,7 +430,7 @@ export default function AddIdea() {
                   {/* Default option */}
                   <option value="">Select duration range...</option>
                   {availableOptions.durations.length !== 0 &&
-                    availableOptions.durations.map((duration) => (
+                    availableOptions.durations.map(duration => (
                       <option key={duration.label} value={duration.id}>
                         {duration.label}
                       </option>
@@ -449,7 +446,7 @@ export default function AddIdea() {
                   type="checkbox"
                   id="isActive"
                   checked={formData.isActive}
-                  onChange={(e) => handleInputChange("isActive", e.target.checked)}
+                  onChange={e => handleInputChange("isActive", e.target.checked)}
                   className="w-5 h-5 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 dark:focus:ring-purple-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                 />
                 <label
@@ -466,7 +463,7 @@ export default function AddIdea() {
                   type="checkbox"
                   id="isChallenge"
                   checked={formData.isChallenge}
-                  onChange={(e) => handleInputChange("isChallenge", e.target.checked)}
+                  onChange={e => handleInputChange("isChallenge", e.target.checked)}
                   className="w-5 h-5 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 dark:focus:ring-purple-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                 />
                 <label

@@ -20,6 +20,7 @@ export async function getFilters() {
   const durations = [];
   const priceRanges = [];
   const groups = [];
+
   // Fetching filters from the backend
   try {
     const res = await fetch(`${apiUrl}/ideas/filters`, {

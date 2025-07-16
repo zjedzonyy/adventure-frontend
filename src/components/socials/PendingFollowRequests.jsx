@@ -37,8 +37,8 @@ export default function PendingFollowRequests({ isExpanded, setIsExpanded }) {
     fetchFollowingRequests();
   }, [refreshTrigger]);
 
-  const onAccept = async (requestId) => {
-    setProcessingIds((prev) => new Set(prev).add(requestId));
+  const onAccept = async requestId => {
+    setProcessingIds(prev => new Set(prev).add(requestId));
     try {
       const response = await fetch(`${apiUrl}/follow-requests/${requestId}/accept`, {
         method: "PATCH",
@@ -47,14 +47,14 @@ export default function PendingFollowRequests({ isExpanded, setIsExpanded }) {
       });
       const data = await response.json();
       if (data.success) {
-        setFollowingRequests((prev) => prev.filter((request) => request.id !== requestId));
+        setFollowingRequests(prev => prev.filter(request => request.id !== requestId));
       } else {
         throw new Error(data.message || "Failed to accept follow request");
       }
     } catch (err) {
       setError(err.message);
     } finally {
-      setProcessingIds((prev) => {
+      setProcessingIds(prev => {
         const copy = new Set(prev);
         copy.delete(requestId);
         return copy;
@@ -63,8 +63,8 @@ export default function PendingFollowRequests({ isExpanded, setIsExpanded }) {
     }
   };
 
-  const onReject = async (requestId) => {
-    setProcessingIds((prev) => new Set(prev).add(requestId));
+  const onReject = async requestId => {
+    setProcessingIds(prev => new Set(prev).add(requestId));
     try {
       const response = await fetch(`${apiUrl}/follow-requests/${requestId}/reject`, {
         method: "PATCH",
@@ -73,14 +73,14 @@ export default function PendingFollowRequests({ isExpanded, setIsExpanded }) {
       });
       const data = await response.json();
       if (data.success) {
-        setFollowingRequests((prev) => prev.filter((request) => request.id !== requestId));
+        setFollowingRequests(prev => prev.filter(request => request.id !== requestId));
       } else {
         throw new Error(data.message || "Failed to reject follow request");
       }
     } catch (err) {
       setError(err.message);
     } finally {
-      setProcessingIds((prev) => {
+      setProcessingIds(prev => {
         const copy = new Set(prev);
         copy.delete(requestId);
         return copy;
@@ -103,7 +103,7 @@ export default function PendingFollowRequests({ isExpanded, setIsExpanded }) {
         {followingRequests.length === 0 ? (
           <p className="text-gray-500 text-sm">{loading ? "Loading..." : "No requests"}</p>
         ) : (
-          followingRequests.map((request) => (
+          followingRequests.map(request => (
             <FollowRequestItem
               key={request.id}
               username={request.fromUsername}

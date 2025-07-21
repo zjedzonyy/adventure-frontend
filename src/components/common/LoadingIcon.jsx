@@ -37,13 +37,13 @@ export default function LoadingWrapper({
   if (loading && showSpinner) {
     if (page) {
       return (
-        <div className="min-h-screen flex items-center justify-center">
+        <div data-testid="spinner" className="min-h-screen flex items-center justify-center">
           <Atom color="#c031cc" size={size} text={loadingText} textColor="" />
         </div>
       );
     }
     return (
-      <div className="flex items-center justify-center">
+      <div data-testid="spinner" className="flex items-center justify-center">
         <Atom color="#c031cc" size={size} text={loadingText} textColor="" />
       </div>
     );

@@ -84,6 +84,7 @@ const ErrorPage = ({
             {/* Error Icon and Code */}
             <div className="mb-8">
               <div
+                data-testid="test-icon"
                 className={`w-24 h-24 bg-gradient-to-r ${config.iconBg} rounded-full flex items-center justify-center text-white mx-auto mb-6 shadow-lg`}
               >
                 {config.icon}

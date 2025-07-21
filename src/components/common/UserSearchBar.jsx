@@ -83,7 +83,7 @@ export default function UserSearchBar() {
   };
 
   return (
-    <div className="relative" ref={searchRef}>
+    <div data-testid="user-search-bar" className="relative" ref={searchRef}>
       {/* Search Input */}
       <div className="relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -109,6 +109,7 @@ export default function UserSearchBar() {
       {/* Dropdown Results */}
       {isDropdownOpen && (
         <div
+          data-testid="user-search-dropdown"
           ref={dropdownRef}
           className="absolute z-50 mt-2 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-80 overflow-y-auto"
         >

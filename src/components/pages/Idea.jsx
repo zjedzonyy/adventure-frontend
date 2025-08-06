@@ -416,7 +416,7 @@ export default function Idea() {
                     </div>
                   </div>
 
-                  <div className="flex flex-col space-y-2 sm:flex-wrap sm:flex-row sm:items-center  sm:space-x-6 w-full sm:w-auto">
+                  <div className="flex flex-col space-y-2 sm:space-y-0 sm:flex-wrap sm:flex-row sm:items-center sm:space-x-6 w-full sm:w-auto">
                     <div className="flex items-center space-x-1 text-gray-500 dark:text-gray-400">
                       <Eye className="w-5 h-5" />
                       <span className="font-medium">{ideaData?.viewCount}</span>

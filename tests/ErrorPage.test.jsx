@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ErrorPage } from "../src/components/errors/index";
-import { renderWithAuthContext } from "./helper";
+import { renderWithAuthContext } from "./utils/helper";
 
 const mockShowToast = vi.fn();
 const mockAuthContext = {
